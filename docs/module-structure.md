@@ -6,6 +6,24 @@ course-management-module/
 ├── docs/
 │   └── README.md
 ├── src/
+│   ├── Domain/
+│   │   ├── Entities/
+│   │   │   └── Course.php
+│   │   ├── Repositories/
+│   │   │   ├── CourseRepositoryInterface.php
+│   │   │   └── CourseReadRepositoryInterface.php
+│   │   ├── Events/
+│   │   │   ├── CourseCreatedEvent.php
+│   │   │   ├── CourseUpdatedEvent.php
+│   │   │   └── CourseDeletedEvent.php
+│   │   ├── ValueObjects/
+│   │   │   ├── CourseId.php
+│   │   │   ├── CourseTitle.php
+│   │   │   └── CourseDuration.php
+│   │   ├── Services/
+│   │   │   └── CourseDomainService.php
+│   │   └── AggregateRoots/
+│   │       └── CourseAggregate.php
 │   ├── Application/
 │   │   ├── Commands/
 │   │   │   ├── CreateCourseCommand.php
@@ -25,19 +43,8 @@ course-management-module/
 │   │   │   └── SearchCoursesHandler.php
 │   │   └── DTOs/
 │   │       ├── CourseDTO.php
-│   │       └── CourseSummaryDTO.php
-│   ├── Domain/
-│   │   ├── Entities/
-│   │   │   └── Course.php
-│   │   ├── Repositories/
-│   │   │   ├── CourseRepositoryInterface.php
-│   │   │   └── CourseReadRepositoryInterface.php
-│   │   ├── ValueObjects/
-│   │   │   ├── CourseId.php
-│   │   │   ├── CourseTitle.php
-│   │   │   └── CourseDuration.php
-│   │   └── Services/
-│   │       └── CourseDomainService.php
+│   │       ├── CourseSummaryDTO.php
+│   │       └── CourseReadModel.php
 │   ├── Infrastructure/
 │   │   ├── Persistence/
 │   │   │   ├── Eloquent/
@@ -50,7 +57,7 @@ course-management-module/
 │   │   ├── Queries/
 │   │   │   └── CourseQueryBuilder.php
 │   │   └── Events/
-│   │       └── CourseCreated.php
+│   │       └── EventDispatcher.php
 │   ├── Presentation/
 │   │   ├── Controllers/
 │   │   │   └── CourseController.php
@@ -67,20 +74,27 @@ course-management-module/
 │   │   │       └── en/
 │   │   │           └── courses.php
 │   │   └── Routes/
-│   │       └── web.php
+│   │       ├── web.php
+│   │       └── api.php
 ├── tests/
 │   ├── Feature/
 │   │   ├── CourseControllerTest.php
 │   ├── Unit/
-│   │   ├── Application/
-│   │   │   ├── CommandHandlers/
-│   │   │   └── QueryHandlers/
 │   │   ├── Domain/
 │   │   │   ├── Entities/
-│   │   │   ├── Services/
-│   │   │   └── Repositories/
-│   └── Infrastructure/
-│       └── Persistence/
+│   │   │   ├── ValueObjects/
+│   │   │   └── Services/
+│   │   ├── Application/
+│   │   │   ├── CommandHandlers/
+│   │   │   ├── QueryHandlers/
+│   │   │   └── DTOs/
+│   │   ├── Infrastructure/
+│   │   │   ├── Persistence/
+│   │   │   ├── Queries/
+│   │   │   └── Events/
+│   └── Presentation/
+│       ├── Controllers/
+│       └── Requests/
 assessment-management-module
 └── composer.json
 learning-system-module
