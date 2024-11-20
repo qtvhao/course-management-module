@@ -1,7 +1,7 @@
 Dưới đây là cấu trúc module “Quản lý khóa học” (Course Management)
 
 ```
-course-management-modmule/
+course-management-module/
 ├── composer.json
 ├── docs/
 │   └── README.md
