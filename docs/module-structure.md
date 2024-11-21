@@ -2,114 +2,95 @@ Dưới đây là cấu trúc module “Quản lý khóa học” (Course Manage
 
 ```
 course-management-module/
-├── composer.json              // Dependency management configuration
-├── docs/                      // Documentation about the module
-│   └── README.md
+├── composer.json                  // Dependency configuration
+├── docs/
+│   └── README.md                  // Module documentation
 ├── src/
-│   ├── Domain/                // Core domain logic and rules
-│   │   ├── Entities/          // Core domain objects
+│   ├── Domain/                    // Core business logic
+│   │   ├── Entities/              // Core domain objects
 │   │   │   └── Course.php
-│   │   ├── Repositories/      // Abstractions for persistence (moved to Infrastructure/Contracts)
-│   │   ├── ValueObjects/      // Immutable objects for properties
-│   │   │   ├── CourseId.php
-│   │   │   ├── CourseTitle.php
-│   │   │   └── CourseDuration.php
-│   │   ├── Events/            // Domain events for system interactions
+│   │   ├── Events/                // Domain events
 │   │   │   ├── CourseCreatedEvent.php
 │   │   │   ├── CourseUpdatedEvent.php
 │   │   │   └── CourseDeletedEvent.php
-│   │   ├── Services/          // Domain-specific services
-│   │   │   └── CourseDomainService.php
-│   │   └── AggregateRoots/    // Aggregate roots for domain consistency
-│   │       └── CourseAggregate.php
-│   ├── Application/           // Application logic (use cases, commands, DTOs)
-│   │   ├── UseCases/          // Specific use cases
+│   │   ├── Repositories/          // Interfaces for read and write repositories
+│   │   │   ├── CourseWriteRepositoryInterface.php
+│   │   │   └── CourseReadRepositoryInterface.php
+│   │   ├── ValueObjects/          // Immutable domain properties
+│   │   │   ├── CourseId.php
+│   │   │   ├── CourseTitle.php
+│   │   │   └── CourseDuration.php
+│   │   └── Services/              // Domain-specific services
+│   │       └── CourseDomainService.php
+│   ├── Application/               // Application layer for use cases and coordination
+│   │   ├── UseCases/              // Specific use cases (create, update, delete course)
 │   │   │   ├── CreateCourseUseCase.php
 │   │   │   ├── UpdateCourseUseCase.php
 │   │   │   └── DeleteCourseUseCase.php
-│   │   ├── Commands/          // Data structures for write actions
+│   │   ├── Commands/              // Data structures for write operations
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
-│   │   ├── CommandHandlers/   // Handlers to process commands
+│   │   ├── CommandHandlers/       // Handlers for commands
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
-│   │   ├── Queries/           // Data structures for read actions
+│   │   ├── Queries/               // Data structures for read operations
 │   │   │   ├── GetCourseByIdQuery.php
 │   │   │   ├── GetAllCoursesQuery.php
 │   │   │   └── SearchCoursesQuery.php
-│   │   ├── QueryHandlers/     // Handlers to process queries
+│   │   ├── QueryHandlers/         // Handlers for queries
 │   │   │   ├── GetCourseByIdHandler.php
 │   │   │   ├── GetAllCoursesHandler.php
 │   │   │   └── SearchCoursesHandler.php
-│   │   ├── DTOs/              // Data Transfer Objects for input/output
+│   │   ├── DTOs/                  // Data transfer objects
 │   │   │   ├── CourseDTO.php
 │   │   │   ├── CourseSummaryDTO.php
 │   │   │   └── CourseReadModel.php
-│   │   └── Services/          // Shared validation or application services
-│   │       └── CourseValidationService.php
-│   ├── Infrastructure/        // Technical implementation details
-│   │   ├── Repositories/      // Repository interfaces and implementations
-│   │   │   ├── Contracts/
-│   │   │   │   └── CourseRepositoryInterface.php
-│   │   │   ├── Eloquent/
-│   │   │   │   ├── EloquentCourseRepository.php
-│   │   │   │   └── EloquentCourseReadRepository.php
-│   │   │   └── Migrations/
-│   │   │       └── 2024_01_01_000000_create_courses_table.php
-│   │   ├── Messaging/         // Event bus implementations
+│   │   ├── EventHandlers/         // Handlers for domain events
+│   │   │   ├── SendEmailOnCourseCreated.php
+│   │   │   └── UpdateCacheOnCourseUpdated.php
+│   │   └── EventDispatcher.php    // Centralized event dispatcher
+│   ├── Infrastructure/            // Technical implementation details
+│   │   ├── Messaging/             // Event buses and technical event handling
 │   │   │   ├── EventBusInterface.php
 │   │   │   ├── InMemoryEventBus.php
 │   │   │   ├── RabbitMQEventBus.php
 │   │   │   ├── KafkaEventBus.php
-│   │   │   └── Handlers/
-│   │   │       ├── SendEmailOnCourseCreated.php
-│   │   │       └── UpdateCacheOnCourseUpdated.php
-│   │   ├── Providers/         // Service providers for DI
-│   │   │   └── CourseManagementServiceProvider.php
-│   │   └── Queries/           // Query builders for persistence
-│   │       └── CourseQueryBuilder.php
-│   └── Presentation/          // User-facing interfaces
-│       ├── Controllers/       // Controllers for handling requests
-│       │   └── CourseController.php
-│       ├── Requests/          // Request validation and input formatting
-│       │   ├── CreateCourseRequest.php
-│       │   ├── UpdateCourseRequest.php
-│       │   └── DeleteCourseRequest.php
-│       ├── Resources/         // Views and translations
-│       │   ├── views/
-│       │   │   ├── index.blade.php
-│       │   │   ├── create.blade.php
-│       │   │   └── edit.blade.php
-│       │   └── lang/
-│       │       └── en/
-│       │           └── courses.php
-│       └── Routes/            // Routes for web and API endpoints
-│           ├── web.php
-│           └── api.php
-├── tests/                     // Automated tests
-│   ├── Feature/               // High-level feature tests
+│   │   └── Persistence/           // Database layer
+│   │       ├── Eloquent/          // Eloquent-specific implementations
+│   │       │   ├── EloquentCourseWriteRepository.php
+│   │       │   └── EloquentCourseReadRepository.php
+│   │       └── Migrations/        // Database migrations
+│   │           └── 2024_01_01_000000_create_courses_table.php
+│   ├── Presentation/              // User-facing interfaces
+│   │   ├── Controllers/           // Application controllers
+│   │   │   └── CourseController.php
+│   │   ├── Requests/              // Request validation and formatting
+│   │   │   ├── CreateCourseRequest.php
+│   │   │   ├── UpdateCourseRequest.php
+│   │   │   └── DeleteCourseRequest.php
+│   │   ├── Resources/             // Views, translations, and static files
+│   │   │   ├── views/
+│   │   │   │   ├── index.blade.php
+│   │   │   │   ├── create.blade.php
+│   │   │   │   └── edit.blade.php
+│   │   │   └── lang/
+│   │   │       └── en/
+│   │   │           └── courses.php
+│   │   └── Routes/                // Route definitions
+│   │       ├── web.php
+│   │       └── api.php
+├── tests/                         // Automated tests
+│   ├── Feature/                   // End-to-end tests
 │   │   └── CourseControllerTest.php
-│   ├── Unit/                  // Unit tests for individual layers
+│   ├── Unit/                      // Unit tests for each layer
 │   │   ├── Domain/
-│   │   │   ├── Entities/
-│   │   │   ├── ValueObjects/
-│   │   │   └── Services/
 │   │   ├── Application/
-│   │   │   ├── CommandHandlers/
-│   │   │   ├── QueryHandlers/
-│   │   │   └── DTOs/
 │   │   ├── Infrastructure/
-│   │   │   ├── Messaging/
-│   │   │   ├── Persistence/
-│   │   │   └── Queries/
-│   │   └── Events/
-│   │       ├── Handlers/
-│   │       └── Subscribers/
-│   └── Presentation/
-│       ├── Controllers/
-│       └── Requests/
+│   │   └── EventHandlers/
+└── bootstrap/                     // Initialization files
+    └── EventHandlersBootstrap.php // Event handler registrations
 assessment-management-module/  // Another module (details omitted)
 └── composer.json              // Dependency management for this module
 learning-system-module/        // Another module (details omitted)
