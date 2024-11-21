@@ -2,70 +2,86 @@ Dưới đây là cấu trúc module “Quản lý khóa học” (Course Manage
 
 ```
 course-management-module/
-├── composer.json
+├── composer.json              // Dependency management configuration
 ├── docs/
-│   └── README.md
+│   └── README.md              // Documentation about the module
 ├── src/
-│   ├── Domain/
-│   │   ├── Entities/
+│   ├── Domain/                // Core business logic and rules
+│   │   ├── Entities/          // Core domain objects (e.g., Course entity)
 │   │   │   └── Course.php
-│   │   ├── Repositories/
+│   │   ├── Repositories/      // Interfaces for data persistence
 │   │   │   ├── CourseRepositoryInterface.php
 │   │   │   └── CourseReadRepositoryInterface.php
-│   │   ├── Events/
+│   │   ├── Events/            // Domain events for system interactions
 │   │   │   ├── CourseCreatedEvent.php
 │   │   │   ├── CourseUpdatedEvent.php
 │   │   │   └── CourseDeletedEvent.php
-│   │   ├── ValueObjects/
+│   │   ├── ValueObjects/      // Immutable objects for domain properties
 │   │   │   ├── CourseId.php
 │   │   │   ├── CourseTitle.php
 │   │   │   └── CourseDuration.php
-│   │   ├── Services/
+│   │   ├── Services/          // Domain-specific business services
 │   │   │   └── CourseDomainService.php
-│   │   └── AggregateRoots/
+│   │   └── AggregateRoots/    // Aggregate roots managing domain consistency
 │   │       └── CourseAggregate.php
-│   ├── Application/
-│   │   ├── Commands/
+│   ├── Application/           // Application logic for use cases
+│   │   ├── UseCases/          // Specific use cases (create, update, delete course)
+│   │   │   ├── CreateCourseUseCase.php
+│   │   │   ├── UpdateCourseUseCase.php
+│   │   │   └── DeleteCourseUseCase.php
+│   │   ├── Commands/          // Data structures for command actions
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
-│   │   ├── CommandHandlers/
+│   │   ├── CommandHandlers/   // Handlers to process commands
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
-│   │   ├── Queries/
+│   │   ├── Queries/           // Data structures for read actions
 │   │   │   ├── GetCourseByIdQuery.php
 │   │   │   ├── GetAllCoursesQuery.php
 │   │   │   └── SearchCoursesQuery.php
-│   │   ├── QueryHandlers/
+│   │   ├── QueryHandlers/     // Handlers to process queries
 │   │   │   ├── GetCourseByIdHandler.php
 │   │   │   ├── GetAllCoursesHandler.php
 │   │   │   └── SearchCoursesHandler.php
-│   │   └── DTOs/
+│   │   └── DTOs/              // Data Transfer Objects for input/output
 │   │       ├── CourseDTO.php
 │   │       ├── CourseSummaryDTO.php
 │   │       └── CourseReadModel.php
-│   ├── Infrastructure/
-│   │   ├── Persistence/
+│   ├── Infrastructure/        // Technical implementation details
+│   │   ├── Messaging/         // Event buses and message handling
+│   │   │   ├── EventBusInterface.php
+│   │   │   ├── InMemoryEventBus.php
+│   │   │   ├── RabbitMQEventBus.php
+│   │   │   ├── KafkaEventBus.php
+│   │   │   └── Events/
+│   │   │       ├── Handlers/
+│   │   │       │   ├── SendEmailOnCourseCreated.php
+│   │   │       │   └── UpdateCacheOnCourseUpdated.php
+│   │   │       └── Subscribers/
+│   │   │           ├── CourseEventSubscriber.php
+│   │   │           └── StudentEventSubscriber.php
+│   │   ├── Persistence/       // Database layer and migrations
 │   │   │   ├── Eloquent/
 │   │   │   │   ├── EloquentCourseRepository.php
 │   │   │   │   └── EloquentCourseReadRepository.php
 │   │   │   └── Migrations/
 │   │   │       └── 2024_01_01_000000_create_courses_table.php
-│   │   ├── Providers/
+│   │   ├── Providers/         // Laravel service providers for dependency injection
 │   │   │   └── CourseManagementServiceProvider.php
-│   │   ├── Queries/
+│   │   ├── Queries/           // Query builders for efficient database access
 │   │   │   └── CourseQueryBuilder.php
-│   │   └── Events/
+│   │   └── Events/            // Event dispatcher and handler registration
 │   │       └── EventDispatcher.php
-│   ├── Presentation/
-│   │   ├── Controllers/
+│   ├── Presentation/          // User-facing interfaces (API, Web)
+│   │   ├── Controllers/       // Application controllers for handling requests
 │   │   │   └── CourseController.php
-│   │   ├── Requests/
+│   │   ├── Requests/          // Request validation and input formatting
 │   │   │   ├── CreateCourseRequest.php
 │   │   │   ├── UpdateCourseRequest.php
 │   │   │   └── DeleteCourseRequest.php
-│   │   ├── Resources/
+│   │   ├── Resources/         // Views, translations, and static resources
 │   │   │   ├── views/
 │   │   │   │   ├── index.blade.php
 │   │   │   │   ├── create.blade.php
@@ -73,14 +89,14 @@ course-management-module/
 │   │   │   └── lang/
 │   │   │       └── en/
 │   │   │           └── courses.php
-│   │   └── Routes/
+│   │   └── Routes/            // Route definitions (web and API endpoints)
 │   │       ├── web.php
 │   │       └── api.php
-├── tests/
-│   ├── Feature/
+├── tests/                     // Automated tests
+│   ├── Feature/               // High-level tests for end-to-end functionality
 │   │   ├── CourseControllerTest.php
-│   ├── Unit/
-│   │   ├── Domain/
+│   ├── Unit/                  // Unit tests for individual components
+│   │   ├── Domain/            
 │   │   │   ├── Entities/
 │   │   │   ├── ValueObjects/
 │   │   │   └── Services/
@@ -89,15 +105,18 @@ course-management-module/
 │   │   │   ├── QueryHandlers/
 │   │   │   └── DTOs/
 │   │   ├── Infrastructure/
+│   │   │   ├── Messaging/
 │   │   │   ├── Persistence/
-│   │   │   ├── Queries/
-│   │   │   └── Events/
+│   │   │   └── Queries/
+│   │   └── Events/
+│   │       ├── Handlers/
+│   │       └── Subscribers/
 │   └── Presentation/
 │       ├── Controllers/
 │       └── Requests/
-assessment-management-module
-└── composer.json
-learning-system-module
-└── composer.json
+assessment-management-module/  // Another module (details omitted)
+└── composer.json              // Dependency management for this module
+learning-system-module/        // Another module (details omitted)
+└── composer.json              // Dependency management for this module
 
 ```
