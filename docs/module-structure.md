@@ -3,33 +3,31 @@ Dưới đây là cấu trúc module “Quản lý khóa học” (Course Manage
 ```
 course-management-module/
 ├── composer.json              // Dependency management configuration
-├── docs/
-│   └── README.md              // Documentation about the module
+├── docs/                      // Documentation about the module
+│   └── README.md
 ├── src/
-│   ├── Domain/                // Core business logic and rules
-│   │   ├── Entities/          // Core domain objects (e.g., Course entity)
+│   ├── Domain/                // Core domain logic and rules
+│   │   ├── Entities/          // Core domain objects
 │   │   │   └── Course.php
-│   │   ├── Repositories/      // Interfaces for data persistence
-│   │   │   ├── CourseRepositoryInterface.php
-│   │   │   └── CourseReadRepositoryInterface.php
+│   │   ├── Repositories/      // Abstractions for persistence (moved to Infrastructure/Contracts)
+│   │   ├── ValueObjects/      // Immutable objects for properties
+│   │   │   ├── CourseId.php
+│   │   │   ├── CourseTitle.php
+│   │   │   └── CourseDuration.php
 │   │   ├── Events/            // Domain events for system interactions
 │   │   │   ├── CourseCreatedEvent.php
 │   │   │   ├── CourseUpdatedEvent.php
 │   │   │   └── CourseDeletedEvent.php
-│   │   ├── ValueObjects/      // Immutable objects for domain properties
-│   │   │   ├── CourseId.php
-│   │   │   ├── CourseTitle.php
-│   │   │   └── CourseDuration.php
-│   │   ├── Services/          // Domain-specific business services
+│   │   ├── Services/          // Domain-specific services
 │   │   │   └── CourseDomainService.php
-│   │   └── AggregateRoots/    // Aggregate roots managing domain consistency
+│   │   └── AggregateRoots/    // Aggregate roots for domain consistency
 │   │       └── CourseAggregate.php
-│   ├── Application/           // Application logic for use cases
-│   │   ├── UseCases/          // Specific use cases (create, update, delete course)
+│   ├── Application/           // Application logic (use cases, commands, DTOs)
+│   │   ├── UseCases/          // Specific use cases
 │   │   │   ├── CreateCourseUseCase.php
 │   │   │   ├── UpdateCourseUseCase.php
 │   │   │   └── DeleteCourseUseCase.php
-│   │   ├── Commands/          // Data structures for command actions
+│   │   ├── Commands/          // Data structures for write actions
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
@@ -45,58 +43,56 @@ course-management-module/
 │   │   │   ├── GetCourseByIdHandler.php
 │   │   │   ├── GetAllCoursesHandler.php
 │   │   │   └── SearchCoursesHandler.php
-│   │   └── DTOs/              // Data Transfer Objects for input/output
-│   │       ├── CourseDTO.php
-│   │       ├── CourseSummaryDTO.php
-│   │       └── CourseReadModel.php
+│   │   ├── DTOs/              // Data Transfer Objects for input/output
+│   │   │   ├── CourseDTO.php
+│   │   │   ├── CourseSummaryDTO.php
+│   │   │   └── CourseReadModel.php
+│   │   └── Services/          // Shared validation or application services
+│   │       └── CourseValidationService.php
 │   ├── Infrastructure/        // Technical implementation details
-│   │   ├── Messaging/         // Event buses and message handling
-│   │   │   ├── EventBusInterface.php
-│   │   │   ├── InMemoryEventBus.php
-│   │   │   ├── RabbitMQEventBus.php
-│   │   │   ├── KafkaEventBus.php
-│   │   │   └── Events/
-│   │   │       ├── Handlers/
-│   │   │       │   ├── SendEmailOnCourseCreated.php
-│   │   │       │   └── UpdateCacheOnCourseUpdated.php
-│   │   │       └── Subscribers/
-│   │   │           ├── CourseEventSubscriber.php
-│   │   │           └── StudentEventSubscriber.php
-│   │   ├── Persistence/       // Database layer and migrations
+│   │   ├── Repositories/      // Repository interfaces and implementations
+│   │   │   ├── Contracts/
+│   │   │   │   └── CourseRepositoryInterface.php
 │   │   │   ├── Eloquent/
 │   │   │   │   ├── EloquentCourseRepository.php
 │   │   │   │   └── EloquentCourseReadRepository.php
 │   │   │   └── Migrations/
 │   │   │       └── 2024_01_01_000000_create_courses_table.php
-│   │   ├── Providers/         // Laravel service providers for dependency injection
+│   │   ├── Messaging/         // Event bus implementations
+│   │   │   ├── EventBusInterface.php
+│   │   │   ├── InMemoryEventBus.php
+│   │   │   ├── RabbitMQEventBus.php
+│   │   │   ├── KafkaEventBus.php
+│   │   │   └── Handlers/
+│   │   │       ├── SendEmailOnCourseCreated.php
+│   │   │       └── UpdateCacheOnCourseUpdated.php
+│   │   ├── Providers/         // Service providers for DI
 │   │   │   └── CourseManagementServiceProvider.php
-│   │   ├── Queries/           // Query builders for efficient database access
-│   │   │   └── CourseQueryBuilder.php
-│   │   └── Events/            // Event dispatcher and handler registration
-│   │       └── EventDispatcher.php
-│   ├── Presentation/          // User-facing interfaces (API, Web)
-│   │   ├── Controllers/       // Application controllers for handling requests
-│   │   │   └── CourseController.php
-│   │   ├── Requests/          // Request validation and input formatting
-│   │   │   ├── CreateCourseRequest.php
-│   │   │   ├── UpdateCourseRequest.php
-│   │   │   └── DeleteCourseRequest.php
-│   │   ├── Resources/         // Views, translations, and static resources
-│   │   │   ├── views/
-│   │   │   │   ├── index.blade.php
-│   │   │   │   ├── create.blade.php
-│   │   │   │   └── edit.blade.php
-│   │   │   └── lang/
-│   │   │       └── en/
-│   │   │           └── courses.php
-│   │   └── Routes/            // Route definitions (web and API endpoints)
-│   │       ├── web.php
-│   │       └── api.php
+│   │   └── Queries/           // Query builders for persistence
+│   │       └── CourseQueryBuilder.php
+│   └── Presentation/          // User-facing interfaces
+│       ├── Controllers/       // Controllers for handling requests
+│       │   └── CourseController.php
+│       ├── Requests/          // Request validation and input formatting
+│       │   ├── CreateCourseRequest.php
+│       │   ├── UpdateCourseRequest.php
+│       │   └── DeleteCourseRequest.php
+│       ├── Resources/         // Views and translations
+│       │   ├── views/
+│       │   │   ├── index.blade.php
+│       │   │   ├── create.blade.php
+│       │   │   └── edit.blade.php
+│       │   └── lang/
+│       │       └── en/
+│       │           └── courses.php
+│       └── Routes/            // Routes for web and API endpoints
+│           ├── web.php
+│           └── api.php
 ├── tests/                     // Automated tests
-│   ├── Feature/               // High-level tests for end-to-end functionality
-│   │   ├── CourseControllerTest.php
-│   ├── Unit/                  // Unit tests for individual components
-│   │   ├── Domain/            
+│   ├── Feature/               // High-level feature tests
+│   │   └── CourseControllerTest.php
+│   ├── Unit/                  // Unit tests for individual layers
+│   │   ├── Domain/
 │   │   │   ├── Entities/
 │   │   │   ├── ValueObjects/
 │   │   │   └── Services/
