@@ -16,22 +16,24 @@ course-management-module/
 │   │   ├── Repositories/          // Interfaces for read and write repositories
 │   │   │   ├── CourseWriteRepositoryInterface.php
 │   │   │   └── CourseReadRepositoryInterface.php
+│   │   ├── Queries/               // CQRS Query definitions
+│   │   │   └── SearchCoursesQuery.php
 │   │   ├── ValueObjects/          // Immutable domain properties
 │   │   │   ├── CourseId.php
 │   │   │   ├── CourseTitle.php
 │   │   │   └── CourseDuration.php
 │   │   └── Services/              // Domain-specific services
 │   │       └── CourseDomainService.php
-│   ├── Application/               // Application layer for use cases and coordination
-│   │   ├── UseCases/              // Specific use cases (create, update, delete course)
+│   ├── Application/               // Application logic for use cases and queries
+│   │   ├── UseCases/              // Specific use cases (create, update, delete)
 │   │   │   ├── CreateCourseUseCase.php
 │   │   │   ├── UpdateCourseUseCase.php
 │   │   │   └── DeleteCourseUseCase.php
-│   │   ├── Commands/              // Data structures for write operations
+│   │   ├── Commands/              // Data structures for command operations
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
-│   │   ├── CommandHandlers/       // Handlers for commands
+│   │   ├── CommandHandlers/       // Command handlers
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
@@ -47,23 +49,33 @@ course-management-module/
 │   │   │   ├── CourseDTO.php
 │   │   │   ├── CourseSummaryDTO.php
 │   │   │   └── CourseReadModel.php
-│   │   ├── EventHandlers/         // Handlers for domain events
+│   │   ├── EventHandlers/         // Event handling logic
 │   │   │   ├── SendEmailOnCourseCreated.php
 │   │   │   └── UpdateCacheOnCourseUpdated.php
 │   │   └── EventDispatcher.php    // Centralized event dispatcher
 │   ├── Infrastructure/            // Technical implementation details
-│   │   ├── Messaging/             // Event buses and technical event handling
+│   │   ├── Messaging/             // Event buses and event handling
 │   │   │   ├── EventBusInterface.php
 │   │   │   ├── InMemoryEventBus.php
 │   │   │   ├── RabbitMQEventBus.php
-│   │   │   ├── KafkaEventBus.php
-│   │   └── Persistence/           // Database layer
-│   │       ├── Eloquent/          // Eloquent-specific implementations
-│   │       │   ├── EloquentCourseWriteRepository.php
-│   │       │   └── EloquentCourseReadRepository.php
-│   │       └── Migrations/        // Database migrations
-│   │           └── 2024_01_01_000000_create_courses_table.php
-│   ├── Presentation/              // User-facing interfaces
+│   │   │   └── KafkaEventBus.php
+│   │   ├── Persistence/           // Database and search integrations
+│   │   │   ├── Eloquent/          // Eloquent-specific implementations
+│   │   │   │   ├── EloquentCourseWriteRepository.php
+│   │   │   │   └── EloquentCourseReadRepository.php
+│   │   │   ├── Search/            // Elasticsearch integration
+│   │   │   │   ├── CourseSearchIndexer.php
+│   │   │   │   ├── CourseSearchRepository.php
+│   │   │   │   └── SearchResult.php
+│   │   │   ├── Queries/           // Query builder and query-related logic
+│   │   │   │   └── CourseQueryBuilder.php
+│   │   │   └── Migrations/        // Database migrations
+│   │   │       └── 2024_01_01_000000_create_courses_table.php
+│   │   ├── Services/              // External services (e.g., email, cache)
+│   │   │   └── EmailService.php
+│   │   └── Providers/             // Service providers for dependency injection
+│   │       └── CourseManagementServiceProvider.php
+│   ├── Presentation/              // User-facing interfaces (API and Web)
 │   │   ├── Controllers/           // Application controllers
 │   │   │   └── CourseController.php
 │   │   ├── Requests/              // Request validation and formatting
@@ -78,17 +90,21 @@ course-management-module/
 │   │   │   └── lang/
 │   │   │       └── en/
 │   │   │           └── courses.php
-│   │   └── Routes/                // Route definitions
+│   │   └── Routes/                // Route definitions (web and API)
 │   │       ├── web.php
 │   │       └── api.php
 ├── tests/                         // Automated tests
-│   ├── Feature/                   // End-to-end tests
+│   ├── Feature/                   // End-to-end functionality tests
 │   │   └── CourseControllerTest.php
-│   ├── Unit/                      // Unit tests for each layer
+│   ├── Unit/                      // Unit tests for components
 │   │   ├── Domain/
 │   │   ├── Application/
+│   │   │   ├── QueryHandlers/
+│   │   │   └── EventHandlers/
 │   │   ├── Infrastructure/
-│   │   └── EventHandlers/
+│   │   │   ├── Search/
+│   │   │   └── Queries/
+│   │   └── Presentation/
 └── bootstrap/                     // Initialization files
     └── EventHandlersBootstrap.php // Event handler registrations
 assessment-management-module/  // Another module (details omitted)
