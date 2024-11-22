@@ -124,22 +124,25 @@ public function testCourseCreationWithInvalidTitleThrowsException() {
 
 #### Application Layer
 
-	1.	Use Cases:
-	•	Write tests for CreateCourseUseCase, UpdateCourseUseCase, and DeleteCourseUseCase.
-	•	Test edge cases (e.g., duplicate course ID).
-	2.	Command Handlers:
-	•	Ensure handlers correctly process commands and interact with the domain and infrastructure layers.
-	•	Mock repositories to isolate tests.
-	3.	Query Handlers:
-	•	Test that queries like GetCourseByIdQuery return accurate data.
+1. Use Cases:
+	- Write tests for `CreateCourseUseCase`, `UpdateCourseUseCase`, and `DeleteCourseUseCase`.
+	- Test edge cases (e.g., duplicate course ID).
+
+2. Command Handlers:
+	- Ensure handlers correctly process commands and interact with the domain and infrastructure layers.
+	- Mock repositories to isolate tests.
+
+3. Query Handlers:
+	- Test that queries like `GetCourseByIdQuery` return accurate data.
 
 #### Infrastructure Layer
 
-	1.	Repositories:
-	•	Write tests for EloquentCourseReadRepository and EloquentCourseWriteRepository:
-	•	Test CRUD operations with a test database.
-	•	Use migrations to ensure the database schema matches expectations.
-	•	Example test:
+1. Repositories:
+	- Write tests for `EloquentCourseReadRepository` and `EloquentCourseWriteRepository`:
+	- Test CRUD operations with a test database.
+	- Use migrations to ensure the database schema matches expectations.
+	- Example test:
+
 ```php
 public function testRepositorySavesAndRetrievesCourse() {
     $course = new Course('course-id-1', 'TDD Basics', '2 hours');
@@ -151,47 +154,50 @@ public function testRepositorySavesAndRetrievesCourse() {
 }
 ```
 
-	2.	Event Bus:
-	•	Test that the RabbitMQEventBus dispatches events correctly.
+2.	Event Bus:
+	- Test that the RabbitMQEventBus dispatches events correctly.
 
-Presentation Layer
+#### Presentation Layer
 
-	1.	Request Validation:
-	•	Write tests for CreateCourseRequest to validate user inputs.
-	•	Example:
+1. Request Validation:
+	- Write tests for `CreateCourseRequest` to validate user inputs.
+	- Example:
 
+```php
 public function testValidationFailsForEmptyTitle() {
-    $response = $this->post('/api/courses', ['title' => '', 'duration' => '3 hours']);
+	$response = $this->post('/api/courses', ['title' => '', 'duration' => '3 hours']);
 
-    $response->assertStatus(422); // HTTP validation error
+	$response->assertStatus(422); // HTTP validation error
 }
+```
 
-
-	2.	Controllers:
-	•	Use feature tests to ensure the CourseController integrates with use cases and repositories correctly.
-	•	Mock dependencies to focus on controller behavior.
+2. Controllers:
+	- Use feature tests to ensure the `CourseController` integrates with use cases and repositories correctly.
+	- Mock dependencies to focus on controller behavior.
 
 ### 6. Integrate and Test End-to-End
 
 After unit testing individual components:
-	1.	Write feature tests to simulate real-world scenarios:
-	•	Example: Creating a course, updating it, and verifying the changes via API.
-	2.	Mock external systems (e.g., email, caching) where needed.
+
+1. Write feature tests to simulate real-world scenarios:
+	- Example: Creating a course, updating it, and verifying the changes via API.
+
+2. Mock external systems (e.g., email, caching) where needed.
 
 ### 7. Refactor and Optimize
 
-	1.	Remove duplication in code and tests.
-	2.	Ensure all tests pass consistently.
-	3.	Use tools like PHPStan or Psalm for static analysis to catch potential issues.
+1. Remove duplication in code and tests.
+2. Ensure all tests pass consistently.
+3. Use tools like PHPStan or Psalm for static analysis to catch potential issues.
 
 ### 8. Monitor Test Coverage
 
-	1.	Use a code coverage tool (e.g., Xdebug or PHPUnit’s built-in coverage) to measure test completeness.
-	2.	Focus on high-priority areas like domain and application logic.
+1. Use a code coverage tool (e.g., Xdebug or PHPUnit’s built-in coverage) to measure test completeness.
+2. Focus on high-priority areas like domain and application logic.
 
 ### 9. Final Steps
 
-	•	Run tests as part of your CI/CD pipeline.
-	•	Share documentation (README.md) for setting up and running tests.
+- Run tests as part of your CI/CD pipeline.
+- Share documentation (README.md) for setting up and running tests.
 
 By following this guide, you’ll build a robust, well-tested module that adheres to TDD principles.
