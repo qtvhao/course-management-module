@@ -1,0 +1,15 @@
+{
+    "name": "qtvhao/course-management-module",
+    "autoload": {
+        "psr-4": {
+            "Qtvhao\\CourseManagement\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "haonghiem",
+            "email": "haonghiem@prepedu.com"
+        }
+    ],
+    "require": {}
+}
