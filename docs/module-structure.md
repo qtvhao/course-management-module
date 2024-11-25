@@ -16,7 +16,7 @@ course-management-module/
 │   │   ├── Repositories/          // Interfaces for read and write repositories
 │   │   │   ├── CourseWriteRepositoryInterface.php
 │   │   │   └── CourseReadRepositoryInterface.php
-│   │   ├── Queries/               // CQRS Query definitions
+│   │   ├── QueriesDefinitions/    // CQRS Query definitions
 │   │   │   └── SearchCoursesQuery.php
 │   │   ├── ValueObjects/          // Immutable domain properties
 │   │   │   ├── CourseId.php
@@ -37,7 +37,7 @@ course-management-module/
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
-│   │   ├── Queries/               // Data structures for read operations
+│   │   ├── DataQueries/           // Data structures for read operations
 │   │   │   ├── GetCourseByIdQuery.php
 │   │   │   ├── GetAllCoursesQuery.php
 │   │   │   └── SearchCoursesQuery.php
@@ -67,7 +67,7 @@ course-management-module/
 │   │   │   │   ├── CourseSearchIndexer.php
 │   │   │   │   ├── CourseSearchRepository.php
 │   │   │   │   └── SearchResult.php
-│   │   │   ├── Queries/           // Query builder and query-related logic
+│   │   │   ├── DBQueries/         // Query builder and query-related logic
 │   │   │   │   └── CourseQueryBuilder.php
 │   │   │   └── Migrations/        // Database migrations
 │   │   │       └── 2024_01_01_000000_create_courses_table.php
