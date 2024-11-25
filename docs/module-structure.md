@@ -1,6 +1,6 @@
 Dưới đây là cấu trúc module “Quản lý khóa học” (Course Management)
 
-```
+```plaintext
 course-management-module/
 ├── composer.json                  // Dependency configuration
 ├── docs/
@@ -103,10 +103,39 @@ course-management-module/
 │   │   │   └── EventHandlers/
 │   │   ├── Infrastructure/
 │   │   │   ├── Search/
-│   │   │   └── Queries/
+│   │   │   └── DbQueries/
 │   │   └── Presentation/
 └── bootstrap/                     // Initialization files
     └── EventHandlersBootstrap.php // Event handler registrations
+shared-module/
+├── src/
+│   ├── Contracts/                 // Interfaces (contracts) của các lớp cơ sở
+│   │   ├── BaseServiceInterface.php
+│   │   ├── BaseModelInterface.php
+│   │   ├── BaseEventInterface.php
+│   │   ├── BaseListenerInterface.php
+│   │   ├── BaseDTOInterface.php
+│   │   ├── BaseMiddlewareInterface.php
+│   │   └── BaseExceptionInterface.php
+│   ├── Services/
+│   │   ├── BaseService.php
+│   │   └── ServiceWithContract.php // Service triển khai theo interface
+│   ├── Models/
+│   │   └── BaseModel.php
+│   ├── Repositories/
+│   │   ├── BaseRepositoryInterface.php
+│   │   └── EloquentBaseRepository.php
+│   ├── Events/
+│   │   ├── BaseEvent.php
+│   │   └── SpecificEvent.php       // Event kế thừa BaseEvent
+│   ├── Middleware/
+│   │   └── BaseMiddleware.php
+│   ├── Exceptions/
+│   │   └── BaseException.php
+│   ├── DTOs/
+│   │   └── BaseDTO.php
+└── tests/
+    └── ...
 assessment-management-module/  // Another module (details omitted)
 └── composer.json              // Dependency management for this module
 learning-system-module/        // Another module (details omitted)
