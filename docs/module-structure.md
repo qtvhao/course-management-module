@@ -98,13 +98,34 @@ course-management-module/
 │   │   └── CourseControllerTest.php
 │   ├── Unit/                      // Unit tests for components
 │   │   ├── Domain/
+│   │   │   ├── Entities/
+│   │   │   ├── Events/
+│   │   │   ├── Repositories/
+│   │   │   ├── QueriesDefinitions/
+│   │   │   ├── ValueObjects/
+│   │   │   └── Services/
 │   │   ├── Application/
+│   │   │   ├── UseCases/
+│   │   │   ├── Commands/
+│   │   │   ├── CommandHandlers/
+│   │   │   ├── DataQueries/
 │   │   │   ├── QueryHandlers/
+│   │   │   ├── DTOs/
 │   │   │   └── EventHandlers/
 │   │   ├── Infrastructure/
-│   │   │   ├── Search/
-│   │   │   └── DbQueries/
+│   │   │   ├── Messaging/
+│   │   │   ├── Persistence/
+│   │   │   │   ├── Eloquent/
+│   │   │   │   ├── Search/
+│   │   │   │   ├── DBQueries/
+│   │   │   │   └── Migrations/
+│   │   │   ├── Services/
+│   │   │   └── Providers/
 │   │   └── Presentation/
+│   │       ├── Controllers/
+│   │       ├── Requests/
+│   │       ├── Resources/
+│   │       └── Routes/
 └── bootstrap/                     // Initialization files
     └── EventHandlersBootstrap.php // Event handler registrations
 shared-module/
