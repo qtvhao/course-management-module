@@ -8,6 +8,9 @@ course-management-module/
 │   └── README.md                  // Module documentation
 ├── src/
 │   ├── Domain/                    // Core business logic
+│   │   ├── Aggregates/            // Aggregate roots
+│   │   │   ├── CourseAggregate.php // Aggregate root for Course
+│   │   │   └── CourseModuleAggregate.php
 │   │   ├── Entities/              // Core domain objects
 │   │   │   └── Course.php
 │   │   ├── Events/                // Domain events
@@ -100,6 +103,7 @@ course-management-module/
 │   │   └── CourseControllerTest.php
 │   ├── Unit/                      // Unit tests for components
 │   │   ├── Domain/
+│   │   │   ├── Aggregates/
 │   │   │   ├── Entities/
 │   │   │   ├── Events/
 │   │   │   ├── Repositories/
