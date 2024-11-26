@@ -93,6 +93,7 @@ course-management-module/
 │   │   └── Routes/                // Route definitions (web and API)
 │   │       ├── web.php
 │   │       └── api.php
+│   └── Helpers/                   // Utility functions
 ├── tests/                         // Automated tests
 │   ├── Feature/                   // End-to-end functionality tests
 │   │   └── CourseControllerTest.php
@@ -126,6 +127,7 @@ course-management-module/
 │   │       ├── Requests/
 │   │       ├── Resources/
 │   │       └── Routes/
+│   └── TestCase.php               // Base test case class
 └── bootstrap/                     // Initialization files
     └── EventHandlersBootstrap.php // Event handler registrations
 shared-module/
@@ -155,6 +157,7 @@ shared-module/
 │   │   └── BaseException.php
 │   ├── DTOs/
 │   │   └── BaseDTO.php
+│   └── Helpers/
 └── tests/
     └── ...
 assessment-management-module/  // Another module (details omitted)
