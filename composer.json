@@ -2,7 +2,8 @@
     "name": "qtvhao/course-management-module",
     "autoload": {
         "psr-4": {
-            "Qtvhao\\CourseManagement\\": "src/"
+            "Qtvhao\\CourseManagement\\": "src/",
+            "Qtvhao\\CourseManagement\\Tests\\": "tests/"
         }
     },
     "authors": [
