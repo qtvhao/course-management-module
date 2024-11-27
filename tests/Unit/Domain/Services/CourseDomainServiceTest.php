@@ -6,6 +6,7 @@ use Qtvhao\CourseManagement\Domain\Entities\Course;
 use Qtvhao\CourseManagement\Domain\Entities\Instructor;
 use Qtvhao\CourseManagement\Domain\Exceptions\InstructorAvailabilityException;
 use Qtvhao\CourseManagement\Domain\Services\CourseDomainService;
+use Qtvhao\StudentManagement\Domain\Aggregates\StudentAggregate;
 
 class CourseDomainServiceTest extends TestCase
 {
@@ -95,5 +96,62 @@ class CourseDomainServiceTest extends TestCase
         // Act & Assert: Không có exception
         $this->courseDomainService->validateInstructorAvailability($instructor, $course);
         $this->assertTrue(true, 'No conflict and sufficient availability.');
+    }
+
+    public function testCanStudentRegisterReturnsTrue(): void
+    {
+        // Mock StudentAggregate
+        $student = $this->createMock(StudentAggregate::class);
+        $student->method('hasCompletedPrerequisiteCourses')
+                ->willReturn(true);
+
+        // Mock CourseAggregate
+        $course = $this->createMock(CourseAggregate::class);
+        $course->method('isFull')
+               ->willReturn(false);
+
+        // Act
+        $result = $this->service->canStudentRegister($student, $course);
+
+        // Assert
+        $this->assertTrue($result);
+    }
+
+    public function testCanStudentRegisterReturnsFalseWhenPrerequisitesNotMet(): void
+    {
+        // Mock StudentAggregate
+        $student = $this->createMock(StudentAggregate::class);
+        $student->method('hasCompletedPrerequisiteCourses')
+                ->willReturn(false);
+
+        // Mock CourseAggregate
+        $course = $this->createMock(CourseAggregate::class);
+        $course->method('isFull')
+               ->willReturn(false);
+
+        // Act
+        $result = $this->service->canStudentRegister($student, $course);
+
+        // Assert
+        $this->assertFalse($result);
+    }
+
+    public function testCanStudentRegisterReturnsFalseWhenCourseIsFull(): void
+    {
+        // Mock StudentAggregate
+        $student = $this->createMock(StudentAggregate::class);
+        $student->method('hasCompletedPrerequisiteCourses')
+                ->willReturn(true);
+
+        // Mock CourseAggregate
+        $course = $this->createMock(CourseAggregate::class);
+        $course->method('isFull')
+               ->willReturn(true);
+
+        // Act
+        $result = $this->service->canStudentRegister($student, $course);
+
+        // Assert
+        $this->assertFalse($result);
     }
 }
