@@ -8,6 +8,7 @@ Khi thực hiện Test-Driven Development (TDD) cho Domain Layer, việc tuân t
 	•	Đảm bảo tính bất biến (immutable) của các đối tượng.
 	•	Ví dụ:
 
+```php
 public function test_valid_course_title(): void
 {
     $title = new CourseTitle('Introduction to TDD');
@@ -19,6 +20,7 @@ public function test_invalid_course_title_throws_exception(): void
     $this->expectException(InvalidArgumentException::class);
     new CourseTitle('');
 }
+```
 
 2. Test các Domain Entities
 
@@ -28,6 +30,7 @@ public function test_invalid_course_title_throws_exception(): void
 	•	Kiểm tra các hành vi hoặc phương thức được định nghĩa trong entity.
 	•	Ví dụ:
 
+```php
 public function test_create_course_entity(): void
 {
     $course = new Course(new CourseId('123'), new CourseTitle('TDD Basics'), new CourseDuration(10));
@@ -35,6 +38,7 @@ public function test_create_course_entity(): void
     $this->assertEquals('TDD Basics', $course->title()->value());
     $this->assertEquals(10, $course->duration()->value());
 }
+```
 
 3. Test các Aggregate Roots
 
@@ -44,11 +48,13 @@ public function test_create_course_entity(): void
 	•	Đảm bảo các invariants (quy tắc bất biến) luôn được giữ vững.
 	•	Ví dụ:
 
+```php
 public function test_course_aggregate_handles_creation_event(): void
 {
     $course = CourseAggregate::create('123', 'Advanced TDD', 15);
     $this->assertInstanceOf(CourseCreatedEvent::class, $course->releaseEvents()[0]);
 }
+```
 
 4. Test các Domain Services (nếu có)
 
@@ -57,12 +63,14 @@ public function test_course_aggregate_handles_creation_event(): void
 	•	Test các trường hợp sử dụng cụ thể được thực hiện bởi domain service.
 	•	Ví dụ:
 
+```php
 public function test_calculate_course_price(): void
 {
     $service = new CourseDomainService();
     $price = $service->calculatePrice(new CourseDuration(10), 100);
     $this->assertEquals(1000, $price);
 }
+```
 
 5. Test các Domain Events
 
@@ -72,12 +80,14 @@ public function test_calculate_course_price(): void
 	•	Đảm bảo thông tin đi kèm với sự kiện là đầy đủ và đúng.
 	•	Ví dụ:
 
+```php
 public function test_course_created_event(): void
 {
     $event = new CourseCreatedEvent('123', 'TDD Basics');
     $this->assertEquals('123', $event->courseId());
     $this->assertEquals('TDD Basics', $event->courseTitle());
 }
+```
 
 **6. Test các Repositories (Mock or In-Memory)
 
@@ -87,6 +97,7 @@ public function test_course_created_event(): void
 	•	Trong TDD, bạn thường mock repository hoặc sử dụng in-memory storage.
 	•	Ví dụ:
 
+```php
 public function test_repository_stores_course(): void
 {
     $repository = new InMemoryCourseRepository();
@@ -96,6 +107,7 @@ public function test_repository_stores_course(): void
     $retrieved = $repository->findById(new CourseId('123'));
     $this->assertEquals($course, $retrieved);
 }
+```
 
 7. Refactor và tối ưu hóa
 
