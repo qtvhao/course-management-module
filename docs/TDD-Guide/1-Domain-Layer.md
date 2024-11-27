@@ -1,139 +1,109 @@
-Khi thực hiện Test-Driven Development (TDD) cho Domain Layer, thứ tự viết test rất quan trọng để đảm bảo bạn phát triển các tính năng theo cách incremental (từng bước) và bám sát logic nghiệp vụ. Dưới đây là thứ tự hợp lý:
+Khi thực hiện Test-Driven Development (TDD) cho Domain Layer, việc tuân thủ thứ tự viết test hợp lý sẽ giúp bạn xây dựng các tính năng một cách incremental (từng bước) và đảm bảo rằng các quy tắc business logic được triển khai chính xác. Dưới đây là thứ tự hợp lý khi viết test:
 
-1. Test Value Objects (VOs)
+1. Test các Value Objects trước
 
-	•	Bắt đầu với các Value Objects vì chúng là những thành phần đơn giản, dễ kiểm tra và thường được sử dụng trong các thành phần khác của domain.
-	•	Lý do:
-	•	VOs là immutable và không có hành vi phức tạp.
-	•	Xây dựng nền tảng cho các thành phần khác, như Entities.
+	•	Lý do: Value Objects là các thành phần cơ bản và bất biến trong domain. Chúng đảm bảo các giá trị trong hệ thống luôn hợp lệ.
+	•	Cách thực hiện:
+	•	Kiểm tra tính hợp lệ của các giá trị (validation logic).
+	•	Đảm bảo tính bất biến (immutable) của các đối tượng.
 	•	Ví dụ:
-	•	Test các giá trị hợp lệ và không hợp lệ:
 
-public function test_valid_course_id()
+public function test_valid_course_title(): void
 {
-    $courseId = new CourseId('valid-uuid');
-    $this->assertEquals('valid-uuid', $courseId->getValue());
+    $title = new CourseTitle('Introduction to TDD');
+    $this->assertEquals('Introduction to TDD', $title->value());
 }
 
-public function test_invalid_course_id_throws_exception()
+public function test_invalid_course_title_throws_exception(): void
 {
     $this->expectException(InvalidArgumentException::class);
-    new CourseId('invalid-id');
+    new CourseTitle('');
 }
 
-2. Test Entities
+2. Test các Domain Entities
 
-	•	Tiếp theo, viết test cho Entities, nơi các logic nghiệp vụ phức tạp hơn có thể được kiểm tra.
-	•	Lý do:
-	•	Entities thường sử dụng VOs làm thuộc tính, vì vậy cần test VO trước.
-	•	Đảm bảo các thuộc tính, quy tắc và hành vi trong Entities được kiểm tra kỹ càng.
+	•	Lý do: Các entities là đối tượng chính trong domain, chứa dữ liệu và các hành vi nghiệp vụ.
+	•	Cách thực hiện:
+	•	Kiểm tra việc khởi tạo entity với các giá trị hợp lệ.
+	•	Kiểm tra các hành vi hoặc phương thức được định nghĩa trong entity.
 	•	Ví dụ:
-	•	Kiểm tra tạo Course entity:
 
-public function test_create_course_with_valid_data()
+public function test_create_course_entity(): void
 {
-    $course = new Course(
-        new CourseId('valid-uuid'),
-        new CourseTitle('Introduction to Programming'),
-        new CourseDuration(10)
-    );
-
-    $this->assertEquals('Introduction to Programming', $course->getTitle()->getValue());
+    $course = new Course(new CourseId('123'), new CourseTitle('TDD Basics'), new CourseDuration(10));
+    $this->assertEquals('123', $course->id()->value());
+    $this->assertEquals('TDD Basics', $course->title()->value());
+    $this->assertEquals(10, $course->duration()->value());
 }
 
-public function test_course_with_invalid_duration_throws_exception()
-{
-    $this->expectException(InvalidArgumentException::class);
-    new Course(
-        new CourseId('valid-uuid'),
-        new CourseTitle('Math 101'),
-        new CourseDuration(-5)
-    );
-}
+3. Test các Aggregate Roots
 
-3. Test Domain Services
-
-	•	Sau khi các Entities và VOs đã được kiểm tra, hãy test Domain Services để đảm bảo các nghiệp vụ phức tạp được xử lý đúng.
-	•	Lý do:
-	•	Domain Services thường thực hiện các logic không thể gán cho một Entity cụ thể.
-	•	Đây là nơi kết hợp nhiều Entities hoặc giá trị.
+	•	Lý do: Aggregate roots quản lý các entities con và đảm bảo các quy tắc nghiệp vụ phức tạp.
+	•	Cách thực hiện:
+	•	Test các hành vi của aggregate root, như việc thay đổi trạng thái hoặc xử lý các tương tác giữa các entity.
+	•	Đảm bảo các invariants (quy tắc bất biến) luôn được giữ vững.
 	•	Ví dụ:
-	•	Kiểm tra tính hợp lệ khi thêm khóa học vào danh sách:
 
-public function test_add_course_to_catalog()
+public function test_course_aggregate_handles_creation_event(): void
 {
-    $catalog = new CourseCatalog();
-    $course = new Course(
-        new CourseId('valid-uuid'),
-        new CourseTitle('Design Patterns'),
-        new CourseDuration(15)
-    );
-
-    $catalog->addCourse($course);
-
-    $this->assertCount(1, $catalog->getCourses());
-    $this->assertEquals('Design Patterns', $catalog->getCourses()[0]->getTitle()->getValue());
+    $course = CourseAggregate::create('123', 'Advanced TDD', 15);
+    $this->assertInstanceOf(CourseCreatedEvent::class, $course->releaseEvents()[0]);
 }
 
-4. Test Domain Events
+4. Test các Domain Services (nếu có)
 
-	•	Sau khi kiểm tra logic nghiệp vụ, hãy kiểm tra các Domain Events.
-	•	Lý do:
-	•	Domain Events giúp phản ánh các thay đổi trong domain.
-	•	Việc test đảm bảo rằng sự kiện được kích hoạt đúng lúc và chứa đúng dữ liệu.
+	•	Lý do: Domain services chứa logic nghiệp vụ không thuộc về bất kỳ entity hoặc value object nào.
+	•	Cách thực hiện:
+	•	Test các trường hợp sử dụng cụ thể được thực hiện bởi domain service.
 	•	Ví dụ:
-	•	Kiểm tra một sự kiện được tạo:
 
-public function test_course_created_event_is_triggered()
+public function test_calculate_course_price(): void
 {
-    $course = new Course(
-        new CourseId('valid-uuid'),
-        new CourseTitle('AI Basics'),
-        new CourseDuration(20)
-    );
-
-    $event = new CourseCreatedEvent($course);
-
-    $this->assertEquals('valid-uuid', $event->getCourseId()->getValue());
-    $this->assertEquals('AI Basics', $event->getCourseTitle()->getValue());
+    $service = new CourseDomainService();
+    $price = $service->calculatePrice(new CourseDuration(10), 100);
+    $this->assertEquals(1000, $price);
 }
 
-5. Test Aggregates
+5. Test các Domain Events
 
-	•	Nếu domain của bạn có các Aggregates, hãy viết test cho chúng.
-	•	Lý do:
-	•	Aggregates là tập hợp logic từ nhiều Entities và VOs, thường xuyên tương tác với nhau.
-	•	Test giúp đảm bảo các thay đổi trạng thái trong aggregate luôn hợp lệ.
+	•	Lý do: Domain events phản ánh các hành vi hoặc trạng thái quan trọng xảy ra trong hệ thống.
+	•	Cách thực hiện:
+	•	Kiểm tra sự kiện được kích hoạt chính xác.
+	•	Đảm bảo thông tin đi kèm với sự kiện là đầy đủ và đúng.
 	•	Ví dụ:
-	•	Kiểm tra toàn bộ nghiệp vụ thêm khóa học và phát sự kiện:
 
-public function test_add_course_to_catalog_raises_event()
+public function test_course_created_event(): void
 {
-    $catalog = new CourseCatalog();
-    $course = new Course(
-        new CourseId('valid-uuid'),
-        new CourseTitle('Machine Learning'),
-        new CourseDuration(30)
-    );
-
-    $catalog->addCourse($course);
-    $events = $catalog->releaseEvents();
-
-    $this->assertCount(1, $events);
-    $this->assertInstanceOf(CourseCreatedEvent::class, $events[0]);
+    $event = new CourseCreatedEvent('123', 'TDD Basics');
+    $this->assertEquals('123', $event->courseId());
+    $this->assertEquals('TDD Basics', $event->courseTitle());
 }
 
-6. Test Repositories (Optional in Domain Layer)
+**6. Test các Repositories (Mock or In-Memory)
 
-	•	Trong TDD, repositories thường được kiểm tra ở Integration Tests hoặc trong Infrastructure Layer. Tuy nhiên, nếu cần, bạn có thể mock các interfaces để kiểm tra việc tương tác với repository.
+	•	Lý do: Repositories là nơi lưu trữ và truy xuất các entities trong domain.
+	•	Cách thực hiện:
+	•	Test các hành vi như lưu, cập nhật, hoặc tìm kiếm entity.
+	•	Trong TDD, bạn thường mock repository hoặc sử dụng in-memory storage.
+	•	Ví dụ:
 
-Tổng Kết Thứ Tự:
+public function test_repository_stores_course(): void
+{
+    $repository = new InMemoryCourseRepository();
+    $course = new Course(new CourseId('123'), new CourseTitle('TDD'), new CourseDuration(10));
+    $repository->save($course);
 
-	1.	Value Objects
-	2.	Entities
-	3.	Domain Services
-	4.	Domain Events
-	5.	Aggregates
-	6.	(Optional) Repositories
+    $retrieved = $repository->findById(new CourseId('123'));
+    $this->assertEquals($course, $retrieved);
+}
 
-Thứ tự này đảm bảo bạn kiểm tra từng phần nhỏ trước khi kiểm tra các thành phần phức tạp hơn, giúp phát hiện lỗi sớm và giữ cho logic domain luôn chính xác. 🛠️
+7. Refactor và tối ưu hóa
+
+	•	Sau khi hoàn thành các bước trên, refactor mã nguồn để đảm bảo tính sạch sẽ (clean code).
+	•	Xem lại các test đã viết để loại bỏ trùng lặp hoặc cải tiến coverage.
+
+Lợi ích của thứ tự này:
+
+	1.	Từng bước và rõ ràng: Tập trung vào các khối xây dựng nhỏ nhất trước, sau đó mới đến các thành phần phức tạp.
+	2.	Dễ bảo trì: Các lỗi được phát hiện ngay ở mức thấp, giảm rủi ro bug lan sang các lớp cao hơn.
+	3.	Bám sát logic nghiệp vụ: Các test phản ánh chính xác cách nghiệp vụ được triển khai trong domain.
