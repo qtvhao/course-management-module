@@ -1,7 +1,7 @@
 Dưới đây là cấu trúc module “Quản lý khóa học” (Course Management)
 
 ```plaintext
-What is the role of class \Qtvhao\CourseManagement\Tests\TestCase in the module?
+This module structure adhered DDD, Clean Architecture, CQRS?
 course-management-module/
 ├── composer.json                  // Dependency configuration, autoloading Qtvhao\CourseManagement namespace
 ├── docs/
