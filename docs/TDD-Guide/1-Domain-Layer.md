@@ -90,11 +90,12 @@ public function test_course_created_event(): void
 ```
 
 ### 6. Test các Repositories (Mock or In-Memory)
-
-- Lý do: Repositories là nơi lưu trữ và truy xuất các entities trong domain.
+- Lý do:
+    - Repositories lưu trữ và truy xuất entities.
+    - Domain Layer chỉ chứa repository interface để tuân thủ nguyên tắc Dependency Inversion Principle (DIP) và giữ Domain Layer độc lập.
 - Cách thực hiện:
-- Test các hành vi như lưu, cập nhật, hoặc tìm kiếm entity.
-- Trong TDD, bạn thường mock repository hoặc sử dụng in-memory storage.
+    - Test các hành vi như lưu, cập nhật, hoặc tìm kiếm entity.
+    - Trong TDD, bạn thường mock repository hoặc sử dụng in-memory storage.
 - Ví dụ:
 
 ```php
