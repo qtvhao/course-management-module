@@ -1,6 +1,6 @@
 Trong cấu trúc của module này, validation cần được đặt ở các vị trí phù hợp tùy thuộc vào mục tiêu và loại validation, đồng thời tuân thủ các nguyên tắc của DDD, Clean Architecture, và CQRS. Sau đây là cách tổ chức hợp lý:
 
-1. Validation tại Presentation Layer
+### 1. Validation tại Presentation Layer
 
 	•	Mục tiêu:
 	•	Xác thực cấu trúc và dữ liệu nhập từ người dùng (e.g., API request, form submission).
@@ -29,7 +29,7 @@ class CreateCourseRequest extends FormRequest
 	•	Loại bỏ các lỗi nhập liệu trước khi logic nghiệp vụ chạy.
 	•	Giữ domain layer sạch, không bị ảnh hưởng bởi các lỗi cơ bản từ phía người dùng.
 
-2. Validation tại Application Layer
+### 2. Validation tại Application Layer
 
 	•	Mục tiêu:
 	•	Kiểm tra logic nghiệp vụ liên quan đến các use case (cách dữ liệu được sử dụng trong ngữ cảnh cụ thể).
@@ -57,7 +57,7 @@ class CreateCourseUseCase
 	•	Ưu điểm:
 	•	Xử lý các quy tắc kinh doanh không thuộc về domain nhưng vẫn cần đảm bảo khi thực hiện các use case cụ thể.
 
-3. Validation tại Domain Layer
+### 3. Validation tại Domain Layer
 
 	•	Mục tiêu:
 	•	Bảo vệ tính toàn vẹn của domain model thông qua các invariants (quy tắc bất biến).
@@ -97,14 +97,15 @@ class CourseTitle
 	•	Ưu điểm:
 	•	Giữ tính toàn vẹn cho domain model, đảm bảo dữ liệu luôn chính xác trong mọi trạng thái.
 
-Tóm tắt cách phối hợp validation
+### Tóm tắt cách phối hợp validation
 
-Loại Validation	Vị trí	Ví dụ cụ thể
-Input Validation	Presentation/Requests/	Xác thực các trường title, duration trong API request.
-Use Case Validation	Application/UseCases/	Kiểm tra tính hợp lệ của action như Course title không được trùng.
-Domain Validation (Invariants)	Domain/Entities/ hoặc Domain/ValueObjects/	Đảm bảo bất biến, ví dụ: Course title không được rỗng, Duration phải lớn hơn 0.
+| Loại Validation                | Vị trí                         | Ví dụ cụ thể                                                                 |
+|---------------------------------|-------------------------------|------------------------------------------------------------------------------|
+| Input Validation                | Presentation/Requests/        | Xác thực các trường title, duration trong API request.                       |
+| Use Case Validation             | Application/UseCases/         | Kiểm tra tính hợp lệ của action như Course title không được trùng.           |
+| Domain Validation (Invariants)  | Domain/Entities/ hoặc Domain/ValueObjects/ | Đảm bảo bất biến, ví dụ: Course title không được rỗng, Duration phải lớn hơn 0. |
 
-Tuân thủ DDD, Clean Architecture, CQRS
+### Tuân thủ DDD, Clean Architecture, CQRS
 
 	•	DDD: Các quy tắc domain nên được đặt trong Domain/, đảm bảo domain model tự bảo vệ mình.
 	•	Clean Architecture: Các lớp khác nhau (Presentation, Application, Domain) có trách nhiệm rõ ràng, không bị trùng lặp logic validation.
@@ -112,7 +113,7 @@ Tuân thủ DDD, Clean Architecture, CQRS
 	•	Command Validation: Kiểm tra dữ liệu cho các thao tác ghi (Create, Update, Delete).
 	•	Query Validation: Kiểm tra các tham số truy vấn, đảm bảo hợp lệ khi thực hiện các thao tác đọc (Search, Filter).
 
-Lời khuyên
+### Lời khuyên
 
 	•	Tránh lặp lại validation:
 	•	Sử dụng các lớp domain (e.g., ValueObjects) để kiểm tra một lần và tái sử dụng.
