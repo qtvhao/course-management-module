@@ -51,6 +51,10 @@ course-management-module/
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
 │   │   ├── DataQueries/           // Data structures for read operations
+│   │   │   ├── Criteria/          // Query criteria
+│   │   │   │   ├── CourseCriteria.php
+│   │   │   │   ├── PaginationCriteria.php
+│   │   │   │   └── SortingCriteria.php
 │   │   │   ├── GetCourseByIdQuery.php
 │   │   │   ├── GetAllCoursesQuery.php
 │   │   │   └── SearchCoursesQuery.php
