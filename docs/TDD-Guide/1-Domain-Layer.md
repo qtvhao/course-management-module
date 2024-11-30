@@ -112,7 +112,7 @@ public function test_course_creation_dispatches_event()
 - Các trường hợp hiếm hoặc khó tái hiện.
 - Các tương tác giữa nhiều phần trong Domain.
 
-### 7. Refactor và tối ưu hóa
+### 8. Refactor và tối ưu hóa
 
 - Sau khi hoàn thành các bước trên, refactor mã nguồn để đảm bảo tính sạch sẽ (clean code).
 - Xem lại các test đã viết để loại bỏ trùng lặp hoặc cải tiến coverage.
