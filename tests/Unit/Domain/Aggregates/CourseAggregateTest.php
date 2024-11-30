@@ -1,61 +1,38 @@
 <?php
-namespace Tests\Unit\Domain\Aggregates;
+namespace Qtvhao\CourseManagement\Tests\Unit\Domain\Aggregates;
 
 use PHPUnit\Framework\TestCase;
 use Qtvhao\CourseManagement\Domain\Aggregates\CourseAggregate;
 use Qtvhao\CourseManagement\Domain\ValueObjects\CourseId;
-use Qtvhao\CourseManagement\Domain\ValueObjects\StudentId;
+use Qtvhao\CourseManagement\Domain\ValueObjects\CourseTitle;
+use Qtvhao\CourseManagement\Domain\ValueObjects\CourseDuration;
+use Qtvhao\CourseManagement\Domain\Events\CourseCreatedEvent;
 
 class CourseAggregateTest extends TestCase
 {
-    public function testRegisterStudentSuccessfully(): void
+    public function testCourseCreatedEventIsDispatched()
     {
-        // Arrange
-        $courseIdMock = $this->createMock(CourseId::class);
-        $studentIdMock = $this->createMock(StudentId::class);
+        // Arrange: Khởi tạo giá trị cho Course
+        $courseId = new CourseId('course-123');
+        $courseTitle = new CourseTitle('Introduction to Clean Architecture');
+        $courseDuration = new CourseDuration(10); // 10 hours
 
-        $courseAggregate = new CourseAggregate($courseIdMock, 10);
+        // Act: Tạo CourseAggregate
+        $courseAggregate = CourseAggregate::create($courseId, $courseTitle, $courseDuration);
 
-        // Act
-        $courseAggregate->registerStudent($studentIdMock);
+        // Assert: Lấy các sự kiện được tạo từ Aggregate
+        $events = $courseAggregate->releaseEvents();
 
-        // Assert
-        $this->assertFalse($courseAggregate->isFull());
-    }
+        // Kiểm tra rằng chỉ có 1 sự kiện
+        $this->assertCount(1, $events);
 
-    public function testThrowsExceptionWhenRegisteringStudentToFullCourse(): void
-    {
-        // Arrange
-        $courseIdMock = $this->createMock(CourseId::class);
-        $studentIdMock = $this->createMock(StudentId::class);
+        // Kiểm tra sự kiện là CourseCreatedEvent
+        $this->assertInstanceOf(CourseCreatedEvent::class, $events[0]);
 
-        $courseAggregate = new CourseAggregate($courseIdMock, 1);
-
-        // Register the first student
-        $courseAggregate->registerStudent($studentIdMock);
-
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('Course is already full.');
-
-        // Act
-        $courseAggregate->registerStudent($studentIdMock);
-    }
-
-    public function testThrowsExceptionWhenStudentAlreadyRegistered(): void
-    {
-        // Arrange
-        $courseIdMock = $this->createMock(CourseId::class);
-        $studentIdMock = $this->createMock(StudentId::class);
-
-        $courseAggregate = new CourseAggregate($courseIdMock, 10);
-
-        // Register the student for the first time
-        $courseAggregate->registerStudent($studentIdMock);
-
-        $this->expectException(\DomainException::class);
-        $this->expectExceptionMessage('Student is already registered.');
-
-        // Act
-        $courseAggregate->registerStudent($studentIdMock);
+        // Kiểm tra các thuộc tính của CourseCreatedEvent
+        $event = $events[0];
+        $this->assertEquals($courseId, $event->getCourseId());
+        $this->assertEquals($courseTitle, $event->getCourseTitle());
+        $this->assertEquals($courseDuration, $event->getCourseDuration());
     }
 }
