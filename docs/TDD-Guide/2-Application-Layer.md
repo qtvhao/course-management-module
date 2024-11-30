@@ -12,7 +12,7 @@ Khi thực hiện Test-Driven Development (TDD) cho Application Layer, việc vi
 
 Ví dụ:
 Kiểm tra CreateCourseUseCase:
-
+```php
 public function testCreateCourseSuccessfully()
 {
     $command = new CreateCourseCommand('Title', 'Description', 10);
@@ -25,7 +25,7 @@ public function testCreateCourseSuccessfully()
 
     $this->assertTrue($result->isSuccess());
 }
-
+```
 2. Test Command Handlers
 
 - Mục tiêu: Đảm bảo rằng các Command Handlers xử lý chính xác dữ liệu từ Command và kích hoạt các actions trong Domain Layer.
@@ -37,6 +37,7 @@ public function testCreateCourseSuccessfully()
 Ví dụ:
 Kiểm tra CreateCourseHandler gọi đúng use case:
 
+```php
 public function testCreateCourseHandlerCallsUseCase()
 {
     $command = new CreateCourseCommand('Title', 'Description', 10);
@@ -47,7 +48,7 @@ public function testCreateCourseHandlerCallsUseCase()
     $handler = new CreateCourseHandler($mockUseCase);
     $handler->handle($command);
 }
-
+```
 3. Test Queries và Query Handlers
 
 - Mục tiêu: Đảm bảo các Queries trả về kết quả chính xác từ nguồn dữ liệu.
@@ -59,6 +60,7 @@ public function testCreateCourseHandlerCallsUseCase()
 Ví dụ:
 Kiểm tra GetCourseByIdHandler:
 
+```php
 public function testGetCourseByIdHandlerReturnsCourseDTO()
 {
     $query = new GetCourseByIdQuery('course-id');
@@ -71,6 +73,7 @@ public function testGetCourseByIdHandlerReturnsCourseDTO()
 
     $this->assertInstanceOf(CourseDTO::class, $result);
 }
+```
 
 4. Test Event Handlers (nếu có)
 
@@ -83,6 +86,7 @@ public function testGetCourseByIdHandlerReturnsCourseDTO()
 Ví dụ:
 Kiểm tra handler gửi email khi sự kiện được kích hoạt:
 
+```php
 public function testSendEmailOnCourseCreated()
 {
     $event = new CourseCreatedEvent('course-id', 'Course Title');
@@ -93,6 +97,7 @@ public function testSendEmailOnCourseCreated()
     $handler = new SendEmailOnCourseCreated($mockEmailService);
     $handler->handle($event);
 }
+```
 
 5. Test Edge Cases và Error Handling
 
@@ -105,6 +110,7 @@ public function testSendEmailOnCourseCreated()
 Ví dụ:
 Kiểm tra lỗi khi không tìm thấy course:
 
+```php
 public function testGetCourseByIdThrowsExceptionIfNotFound()
 {
     $query = new GetCourseByIdQuery('invalid-id');
@@ -117,7 +123,7 @@ public function testGetCourseByIdThrowsExceptionIfNotFound()
     $this->expectException(CourseNotFoundException::class);
     $handler->handle($query);
 }
-
+```
 Thứ tự tổng quát:
 
 	1.	Use Cases – Xây dựng cốt lõi logic nghiệp vụ.
