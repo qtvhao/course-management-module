@@ -38,6 +38,7 @@ course-management-module/
 │   │       ├── ScheduleValidationService.php
 │   │       ├── RelatedCoursesValidationService.php
 │   │       ├── CourseUpdateValidationService.php
+│   │       ├── AuthorizationService.php
 │   │       └── ...
 │   ├── Application/               // Application logic for use cases and queries
 │   │   ├── UseCases/              // Specific use cases (create, update, delete)
