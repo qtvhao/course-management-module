@@ -1,102 +1,33 @@
-Dưới đây là danh sách các Aggregates tiềm năng có thể được injected vào CourseDomainService trong kiến trúc DDD, cùng với giải thích về lý do và vai trò của chúng:
+Bảng 1: Các Domain Services và Mục Đích của Chúng
 
-1. CourseAggregate
+Bảng này liệt kê các Domain Services với mục đích cụ thể và lý do vì sao chúng thuộc về Domain Service.
 
-- Mô tả: Aggregate chính của module, đại diện cho khóa học.
-- Lý do inject:
-- Là trung tâm của các nghiệp vụ liên quan đến khóa học.
-- Dùng để lấy thông tin chi tiết như tiêu đề, thời gian, trạng thái, hoặc danh sách học viên đăng ký.
-- Ví dụ sử dụng:
-- Kiểm tra trạng thái khóa học (isActive()).
-- Lấy danh sách học viên để tính toán tỷ lệ hoàn thành (calculateCompletionRate()).
+Domain Service	Mục đích	Vì sao nó thuộc về Domain Service?
+PrerequisiteValidationService	Kiểm tra các điều kiện tiên quyết của khóa học (ví dụ: tránh phụ thuộc vòng lặp).	Xử lý các quy tắc kinh doanh liên quan đến nhiều thực thể (CourseId[]) và không thuộc về riêng bất kỳ một thực thể nào.
+ProgressCalculationService	Tính toán tiến độ hoàn thành của học viên trong khóa học.	Là logic tính toán liên quan đến nhiều ValueObjects (module đã hoàn thành và tổng số module). Thuần túy và độc lập với hạ tầng.
+ScheduleValidationService	Xác minh lịch trình của khóa học, đảm bảo không bị chồng chéo.	Là quy tắc kinh doanh cần so sánh giữa các ValueObjects (Schedule) và không liên quan đến cơ sở dữ liệu hay hệ thống khác.
+RelatedCoursesValidationService	Kiểm tra các mối quan hệ giữa các khóa học, như điều kiện tiên quyết hoặc khóa học kế tiếp.	Các quy tắc này ảnh hưởng đến nhiều thực thể (CourseAggregate và danh sách khóa học liên quan), phù hợp với tầng miền.
+CourseUpdateValidationService	Kiểm tra và đảm bảo các cập nhật khóa học tuân theo quy tắc miền.	Phối hợp logic kiểm tra trên các thuộc tính của thực thể, tránh các thay đổi làm hỏng tính nhất quán trong miền.
 
-2. StudentAggregate
+Bảng 2: Các Phương Thức Bị Loại Bỏ và Lý Do
 
-- Mô tả: Aggregate đại diện cho học viên tham gia khóa học.
-- Lý do inject:
-- Xử lý các logic liên quan đến học viên, chẳng hạn như danh sách học viên đăng ký, tiến độ học tập, hoặc trạng thái hoàn thành khóa học.
-- Ví dụ sử dụng:
-- Tính tỷ lệ hoàn thành của học viên (calculateCompletionRate()).
-- Gửi thông báo đến học viên (notifyStudentsOfUpdate()).
-- Lấy danh sách học viên đủ điều kiện nhận chứng chỉ (generateCertificate()).
+Bảng này giải thích tại sao một số phương thức bị loại khỏi Domain Service, nêu rõ rằng chúng thuộc về các lớp hoặc tầng khác.
 
-3. InstructorAggregate
+Phương thức	Mục đích	Lý do không thuộc về Domain Service
+verifyCourseAvailability	Xác minh khóa học có thể đăng ký không (dựa vào cơ sở dữ liệu hoặc hệ thống khác).	Phụ thuộc vào dữ liệu từ cơ sở hạ tầng (database) và các hệ thống khác, nên thuộc về Application Layer hoặc Infrastructure Layer.
+triggerNotifications	Gửi thông báo đến người dùng khi có sự kiện liên quan đến khóa học.	Xử lý thông báo là vấn đề của hạ tầng (gửi email, tin nhắn) và không thuộc về logic thuần túy của miền.
+assignInstructors	Gán giảng viên cho khóa học dựa trên dữ liệu và điều kiện.	Phụ thuộc vào các hệ thống bên ngoài (danh sách giảng viên, cơ sở dữ liệu), nên thuộc về Application Layer.
+validateCourseCapacity	Kiểm tra xem số lượng học viên đã đạt giới hạn tối đa chưa.	Phụ thuộc vào dữ liệu từ cơ sở dữ liệu (số lượng học viên đăng ký), không thể thực hiện trong tầng miền.
 
-- Mô tả: Aggregate đại diện cho giảng viên của khóa học.
-- Lý do inject:
-- Quản lý các logic liên quan đến giảng viên, như kiểm tra lịch rảnh, phân công giảng dạy, hoặc thay đổi giảng viên.
-- Ví dụ sử dụng:
-- Kiểm tra tính khả dụng của giảng viên (validateInstructorAvailability()).
-- Gán hoặc cập nhật giảng viên cho khóa học (assignInstructor()).
+Giới hạn Vai Trò của Domain Services
 
-4. ScheduleAggregate
+	•	Thuộc về Domain Service:
+	•	Logic cần xử lý nhiều thực thể hoặc giá trị miền nhưng không liên quan đến hạ tầng.
+	•	Logic là “thuần túy miền” (domain-pure), không phụ thuộc vào trạng thái bên ngoài (database, API, hệ thống khác).
+	•	Logic không nằm gọn trong một thực thể hoặc giá trị đối tượng mà cần sự phối hợp giữa chúng.
+	•	Không thuộc về Domain Service:
+	•	Logic phụ thuộc vào hạ tầng hoặc các hệ thống bên ngoài (cơ sở dữ liệu, APIs).
+	•	Logic liên quan đến tác vụ kỹ thuật (gửi email, gán tài nguyên từ cơ sở dữ liệu).
+	•	Logic thuộc về Application Layer để thực thi các trường hợp sử dụng (use cases).
 
-- Mô tả: Aggregate đại diện cho lịch học và các buổi học trong khóa học.
-- Lý do inject:
-- Hỗ trợ quản lý lịch trình và tránh xung đột giữa các khóa học.
-- Tính toán thời gian học tổng cộng hoặc xác minh lịch học hợp lệ.
-- Ví dụ sử dụng:
-- Kiểm tra xung đột lịch học (validateCourseSchedule()).
-- Tính tổng thời gian học của khóa học (calculateTotalDuration()).
-
-5. CertificateAggregate
-
-- Mô tả: Aggregate đại diện cho chứng chỉ của khóa học.
-- Lý do inject:
-- Đảm bảo các quy tắc cấp chứng chỉ, lưu trữ và phát hành chứng chỉ cho học viên.
-- Ví dụ sử dụng:
-- Tạo và lưu chứng chỉ cho học viên (generateCertificate()).
-- Kiểm tra học viên đã nhận chứng chỉ chưa.
-
-6. EnrollmentAggregate
-
-- Mô tả: Aggregate quản lý việc đăng ký của học viên vào khóa học.
-- Lý do inject:
-- Kiểm tra trạng thái đăng ký, tính số lượng slot còn trống, và xử lý các nghiệp vụ liên quan đến học viên đăng ký hoặc hủy đăng ký.
-- Ví dụ sử dụng:
-- Kiểm tra số lượng học viên còn trống (calculateRemainingSlots()).
-- Xác minh học viên có hợp lệ để đăng ký không.
-
-Tổng hợp
-
-CourseDomainService có thể làm việc với nhiều Aggregates khác nhau để xử lý các nghiệp vụ phức tạp hoặc xuyên suốt nhiều Aggregate. Các Aggregate tiềm năng bao gồm:
-| Aggregate           | Vai trò chính                                         |
-|---------------------|-------------------------------------------------------|
-| CourseAggregate     | Trung tâm quản lý thông tin và trạng thái của khóa học. |
-| StudentAggregate    | Quản lý logic liên quan đến học viên.                 |
-| InstructorAggregate | Quản lý logic liên quan đến giảng viên.               |
-| ScheduleAggregate   | Xử lý lịch học và tránh xung đột.                     |
-| CertificateAggregate| Cấp phát và quản lý chứng chỉ.                        |
-| EnrollmentAggregate | Quản lý đăng ký học viên và các slot của khóa học.    |
-
-Ví dụ
-
-Dưới đây là cách một số Aggregates có thể được injected vào CourseDomainService:
-```php
-class CourseDomainService
-{
-    private CourseAggregate $course;
-    private StudentAggregate $student;
-    private InstructorAggregate $instructor;
-    private ScheduleAggregate $schedule;
-
-    public function __construct(
-        CourseAggregate $course,
-        StudentAggregate $student,
-        InstructorAggregate $instructor,
-        ScheduleAggregate $schedule
-    ) {
-        $this->course = $course;
-        $this->student = $student;
-        $this->instructor = $instructor;
-        $this->schedule = $schedule;
-    }
-
-    public function calculateCompletionRate(): float
-    {
-        $progress = $this->student->getProgress($this->course->getId());
-        return $this->course->calculateCompletionRate($progress);
-    }
-}
-```
-Hy vọng phần này giúp bạn hình dung rõ hơn về cách CourseDomainService phối hợp với các Aggregates! 😊
+Bằng cách phân tách rõ ràng, bạn có thể duy trì sự tập trung và tinh gọn cho từng tầng trong kiến trúc Domain-Driven Design (DDD).
