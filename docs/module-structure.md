@@ -34,7 +34,12 @@ course-management-module/
 │   │   │   ├── CourseTitle.php
 │   │   │   └── CourseDuration.php
 │   │   └── Services/              // Domain-specific services
-│   │       └── CourseDomainService.php
+│   │       ├── PrerequisiteValidationService.php
+│   │       ├── ProgressCalculationService.php
+│   │       ├── ScheduleValidationService.php
+│   │       ├── RelatedCoursesValidationService.php
+│   │       ├── CourseUpdateValidationService.php
+│   │       └── ...
 │   ├── Application/               // Application logic for use cases and queries
 │   │   ├── UseCases/              // Specific use cases (create, update, delete)
 │   │   │   ├── CreateCourseUseCase.php
