@@ -11,15 +11,24 @@ course-management-module/
 │   │   ├── Aggregates/            // Aggregate roots
 │   │   │   ├── CourseAggregate.php // Aggregate root for Course
 │   │   │   └── CourseModuleAggregate.php
+│   │   ├── Contracts/
+│   │   │   ├── Repositories/      // Các interface repository
+│   │   │   │   ├── CourseWriteRepositoryInterface.php
+│   │   │   │   ├── CourseReadRepositoryInterface.php
+│   │   │   │   └── CourseSearchRepositoryInterface.php
+│   │   │   ├── Services/          // Các interface service
+│   │   │   │   └── CourseDomainServiceInterface.php
+│   │   │   ├── Events/            // Các contract cho sự kiện
+│   │   │   │   └── DomainEventInterface.php
+│   │   │   └── Handlers/          // Các contract cho event/command/query handler
+│   │   │       ├── CommandHandlerInterface.php
+│   │   │       └── QueryHandlerInterface.php
 │   │   ├── Entities/              // Core domain objects
 │   │   │   └── Course.php
 │   │   ├── Events/                // Domain events
 │   │   │   ├── CourseCreatedEvent.php
 │   │   │   ├── CourseUpdatedEvent.php
 │   │   │   └── CourseDeletedEvent.php
-│   │   ├── RepositoryInterfaces/  // Interfaces for read and write repositories
-│   │   │   ├── CourseWriteRepositoryInterface.php
-│   │   │   └── CourseReadRepositoryInterface.php
 │   │   ├── QueriesDefinitions/    // CQRS Query definitions
 │   │   │   └── SearchCoursesQuery.php
 │   │   ├── ValueObjects/          // Immutable domain properties
