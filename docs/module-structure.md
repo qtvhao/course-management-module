@@ -18,8 +18,6 @@ course-management-module/
 │   │   │   │   └── CourseSearchRepositoryInterface.php
 │   │   │   ├── Services/          // Các interface service
 │   │   │   │   └── CourseDomainServiceInterface.php
-│   │   │   ├── Events/            // Các contract cho sự kiện
-│   │   │   │   └── DomainEventInterface.php
 │   │   │   └── Handlers/          // Các contract cho event/command/query handler
 │   │   │       ├── CommandHandlerInterface.php
 │   │   │       └── QueryHandlerInterface.php
