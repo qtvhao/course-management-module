@@ -150,7 +150,9 @@ course-management-module/
     └── EventHandlersBootstrap.php // Event handler registrations
 shared-module/
 ├── src/
-│   ├── Contracts/                 // Interfaces (contracts) của các lớp cơ sở
+│   ├── Traits                      // Reusable traits
+│   │   └── RecordsDomainEvents.php // Domain event recording (dùng cho Aggregate)
+│   ├── Contracts/                  // Interfaces (contracts) của các lớp cơ sở
 │   │   ├── BaseServiceInterface.php
 │   │   ├── BaseModelInterface.php
 │   │   ├── BaseEventInterface.php
