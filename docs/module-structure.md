@@ -17,7 +17,7 @@ course-management-module/
 │   │   │   ├── CourseCreatedEvent.php
 │   │   │   ├── CourseUpdatedEvent.php
 │   │   │   └── CourseDeletedEvent.php
-│   │   ├── Repositories/          // Interfaces for read and write repositories
+│   │   ├── RepositoryInterfaces/  // Interfaces for read and write repositories
 │   │   │   ├── CourseWriteRepositoryInterface.php
 │   │   │   └── CourseReadRepositoryInterface.php
 │   │   ├── QueriesDefinitions/    // CQRS Query definitions
