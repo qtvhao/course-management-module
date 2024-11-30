@@ -40,7 +40,24 @@ public function test_create_course_entity(): void
 }
 ```
 
-### 3. Test các Aggregate Roots
+### 3. Test các Domain Events
+
+- Lý do: Domain events phản ánh các hành vi hoặc trạng thái quan trọng xảy ra trong hệ thống.
+- Cách thực hiện:
+- Kiểm tra sự kiện được kích hoạt chính xác.
+- Đảm bảo thông tin đi kèm với sự kiện là đầy đủ và đúng.
+- Ví dụ:
+
+```php
+public function test_course_created_event(): void
+{
+    $event = new CourseCreatedEvent('123', 'TDD Basics');
+    $this->assertEquals('123', $event->courseId());
+    $this->assertEquals('TDD Basics', $event->courseTitle());
+}
+```
+
+### 4. Test các Aggregate Roots
 
 - Lý do: Aggregate roots quản lý các entities con và đảm bảo các quy tắc nghiệp vụ phức tạp.
 - Cách thực hiện:
@@ -56,7 +73,7 @@ public function test_course_aggregate_handles_creation_event(): void
 }
 ```
 
-### 4. Test các Domain Services (nếu có)
+### 5. Test các Domain Services (nếu có)
 
 - Lý do: Domain services chứa logic nghiệp vụ không thuộc về bất kỳ entity hoặc value object nào.
 - Cách thực hiện:
@@ -69,23 +86,6 @@ public function test_calculate_course_price(): void
     $service = new CourseDomainService();
     $price = $service->calculatePrice(new CourseDuration(10), 100);
     $this->assertEquals(1000, $price);
-}
-```
-
-### 5. Test các Domain Events
-
-- Lý do: Domain events phản ánh các hành vi hoặc trạng thái quan trọng xảy ra trong hệ thống.
-- Cách thực hiện:
-- Kiểm tra sự kiện được kích hoạt chính xác.
-- Đảm bảo thông tin đi kèm với sự kiện là đầy đủ và đúng.
-- Ví dụ:
-
-```php
-public function test_course_created_event(): void
-{
-    $event = new CourseCreatedEvent('123', 'TDD Basics');
-    $this->assertEquals('123', $event->courseId());
-    $this->assertEquals('TDD Basics', $event->courseTitle());
 }
 ```
 
