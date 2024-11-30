@@ -99,11 +99,12 @@ class CourseTitle
 
 ### Tóm tắt cách phối hợp validation
 
-| Loại Validation                | Vị trí                         | Ví dụ cụ thể                                                                 |
-|---------------------------------|-------------------------------|------------------------------------------------------------------------------|
-| Input Validation                | Presentation/Requests/        | Xác thực các trường title, duration trong API request.                       |
-| Use Case Validation             | Application/UseCases/         | Kiểm tra tính hợp lệ của action như Course title không được trùng.           |
-| Domain Validation (Invariants)  | Domain/Entities/ hoặc Domain/ValueObjects/ | Đảm bảo bất biến, ví dụ: Course title không được rỗng, Duration phải lớn hơn 0. |
+| Loại Validation                       | Vị trí                                        | Ví dụ cụ thể                                                                          |
+|---------------------------------------|-----------------------------------------------|---------------------------------------------------------------------------------------|
+| Input Validation                      | Presentation/Requests/                        | Xác thực các trường title, duration trong API request.                                |
+| Use Case Validation                   | Application/UseCases/                         | Kiểm tra tính hợp lệ của action như Course title không được trùng.                    |
+| Domain Validation (Invariants)        | Domain/Entities/ hoặc Domain/ValueObjects/    | Đảm bảo bất biến, ví dụ: Course title không được rỗng, Duration phải lớn hơn 0.       |
+| Domain Validation (Business Rules)    | Domain/Services/                              | Kiểm tra các quy tắc kinh doanh phức tạp như kiểm tra prerequisites, related courses. |
 
 ### Tuân thủ DDD, Clean Architecture, CQRS
 
