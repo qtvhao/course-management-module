@@ -115,8 +115,6 @@ course-management-module/
 │   │   │   ├── Aggregates/
 │   │   │   ├── Entities/
 │   │   │   ├── Events/
-│   │   │   ├── Repositories/
-│   │   │   ├── QueriesDefinitions/
 │   │   │   ├── ValueObjects/
 │   │   │   └── Services/
 │   │   ├── Application/
