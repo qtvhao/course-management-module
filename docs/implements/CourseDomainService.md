@@ -24,12 +24,12 @@ Bảng này giải thích tại sao một số phương thức bị loại khỏ
 Giới hạn Vai Trò của Domain Services
 
 - Thuộc về Domain Service:
-- Logic cần xử lý nhiều thực thể hoặc giá trị miền nhưng không liên quan đến hạ tầng.
-- Logic là “thuần túy miền” (domain-pure), không phụ thuộc vào trạng thái bên ngoài (database, API, hệ thống khác).
-- Logic không nằm gọn trong một thực thể hoặc giá trị đối tượng mà cần sự phối hợp giữa chúng.
+    - Logic cần xử lý nhiều thực thể hoặc giá trị miền nhưng không liên quan đến hạ tầng.
+    - Logic là “thuần túy miền” (domain-pure), không phụ thuộc vào trạng thái bên ngoài (database, API, hệ thống khác).
+    - Logic không nằm gọn trong một thực thể hoặc giá trị đối tượng mà cần sự phối hợp giữa chúng.
 - Không thuộc về Domain Service:
-- Logic phụ thuộc vào hạ tầng hoặc các hệ thống bên ngoài (cơ sở dữ liệu, APIs).
-- Logic liên quan đến tác vụ kỹ thuật (gửi email, gán tài nguyên từ cơ sở dữ liệu).
-- Logic thuộc về Application Layer để thực thi các trường hợp sử dụng (use cases).
+    - Logic phụ thuộc vào hạ tầng hoặc các hệ thống bên ngoài (cơ sở dữ liệu, APIs).
+    - Logic liên quan đến tác vụ kỹ thuật (gửi email, gán tài nguyên từ cơ sở dữ liệu).
+    - Logic thuộc về Application Layer để thực thi các trường hợp sử dụng (use cases).
 
 Bằng cách phân tách rõ ràng, bạn có thể duy trì sự tập trung và tinh gọn cho từng tầng trong kiến trúc Domain-Driven Design (DDD).
