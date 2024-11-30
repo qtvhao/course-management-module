@@ -89,31 +89,38 @@ public function test_course_created_event(): void
 }
 ```
 
-### 6. Test các Repositories (Mock or In-Memory)
+### 6. Test các Integration giữa Entities và Domain Events
 - Lý do:
-    - Repositories lưu trữ và truy xuất entities.
-    - Domain Layer chỉ chứa repository interface để tuân thủ nguyên tắc Dependency Inversion Principle (DIP) và giữ Domain Layer độc lập.
+    - Kiểm tra luồng hoạt động giữa Entity và các Domain Events.
 - Cách thực hiện:
-    - Test các hành vi như lưu, cập nhật, hoặc tìm kiếm entity.
-    - Trong TDD, bạn thường mock repository hoặc sử dụng in-memory storage.
+    - Đảm bảo rằng một sự kiện được tạo ra khi một hành động xảy ra trên Entity.
 - Ví dụ:
 
 ```php
-public function test_repository_stores_course(): void
+public function test_course_creation_dispatches_event()
 {
-    $repository = new InMemoryCourseRepository();
-    $course = new Course(new CourseId('123'), new CourseTitle('TDD'), new CourseDuration(10));
-    $repository->save($course);
+    $course = new CourseAggregate(new CourseId(1), new CourseTitle('Intro to PHP'));
+    $events = $course->pullDomainEvents();
 
-    $retrieved = $repository->findById(new CourseId('123'));
-    $this->assertEquals($course, $retrieved);
+    $this->assertInstanceOf(CourseCreatedEvent::class, $events[0]);
 }
 ```
+
+### 7. Viết Test cho Partitions hoặc Complex Scenarios (nếu có)
+
+- Mục tiêu: Kiểm tra các logic đặc thù của domain, chẳng hạn như:
+- Các trường hợp hiếm hoặc khó tái hiện.
+- Các tương tác giữa nhiều phần trong Domain.
 
 ### 7. Refactor và tối ưu hóa
 
 - Sau khi hoàn thành các bước trên, refactor mã nguồn để đảm bảo tính sạch sẽ (clean code).
 - Xem lại các test đã viết để loại bỏ trùng lặp hoặc cải tiến coverage.
+
+### Kết Luận
+
+Thứ tự hợp lý trong TDD cho Domain Layer:
+	1.	Value Objects → 2. Entities → 3. Domain Events → 4. Aggregate Roots → 5. Domain Services → 6. Integration Tests.
 
 ### Lợi ích của thứ tự này:
 
