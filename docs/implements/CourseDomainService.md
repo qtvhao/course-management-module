@@ -21,7 +21,7 @@ Bảng này giải thích tại sao một số phương thức bị loại khỏ
 | assignInstructors			| Gán giảng viên cho khóa học dựa trên dữ liệu và điều kiện.							| Phụ thuộc vào các hệ thống bên ngoài (danh sách giảng viên, cơ sở dữ liệu), nên thuộc về Application Layer.						|
 | validateCourseCapacity	| Kiểm tra xem số lượng học viên đã đạt giới hạn tối đa chưa.							| Phụ thuộc vào dữ liệu từ cơ sở dữ liệu (số lượng học viên đăng ký), không thể thực hiện trong tầng miền.							|
 
-Giới hạn Vai Trò của Domain Services
+### Giới hạn Vai Trò của Domain Services
 
 - Thuộc về Domain Service:
     - Logic cần xử lý nhiều thực thể hoặc giá trị miền nhưng không liên quan đến hạ tầng.
