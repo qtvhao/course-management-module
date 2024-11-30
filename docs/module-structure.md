@@ -78,6 +78,7 @@ course-management-module/
 │   ├── Infrastructure/            // Technical implementation details
 │   │   ├── Messaging/             // Event buses and event handling
 │   │   │   ├── InMemoryCommandBus.php
+│   │   │   ├── QueueCommandBus.php // Command bus implementation using Laravel queues
 │   │   │   ├── RabbitMQCommandBus.php
 │   │   │   ├── KafkaCommandBus.php
 │   │   │   ├── ...
