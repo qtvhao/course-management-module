@@ -49,6 +49,8 @@ course-management-module/
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
+│   │   ├── Contracts/
+│   │   │   ├── CommandBusInterface.php
 │   │   ├── CommandHandlers/       // Command handlers
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
@@ -75,6 +77,10 @@ course-management-module/
 │   │   └── EventDispatcher.php    // Centralized event dispatcher
 │   ├── Infrastructure/            // Technical implementation details
 │   │   ├── Messaging/             // Event buses and event handling
+│   │   │   ├── InMemoryCommandBus.php
+│   │   │   ├── RabbitMQCommandBus.php
+│   │   │   ├── KafkaCommandBus.php
+│   │   │   ├── ...
 │   │   │   ├── EventBusInterface.php
 │   │   │   ├── InMemoryEventBus.php
 │   │   │   ├── RabbitMQEventBus.php
