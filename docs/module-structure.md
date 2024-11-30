@@ -114,7 +114,7 @@ course-management-module/
 │   │       ├── web.php
 │   │       └── api.php
 │   └── Helpers/                   // Utility functions
-├── tests/                         // Automated tests
+├── tests/                         // Automated tests, autoloading Qtvhao\CourseManagement\Tests namespace
 │   ├── Feature/                   // End-to-end functionality tests
 │   │   └── CourseControllerTest.php
 │   ├── Unit/                      // Unit tests for components
