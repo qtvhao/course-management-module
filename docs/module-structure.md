@@ -16,8 +16,7 @@ course-management-module/
 │   │   │   │   ├── CourseWriteRepositoryInterface.php
 │   │   │   │   ├── CourseReadRepositoryInterface.php
 │   │   │   │   └── CourseSearchRepositoryInterface.php
-│   │   │   ├── Services/          // Các interface service
-│   │   │   │   └── CourseDomainServiceInterface.php
+│   │   │   ├── Services/          // Các interface service (optional)
 │   │   │   └── Handlers/          // Các contract cho event/command/query handler
 │   │   │       ├── CommandHandlerInterface.php
 │   │   │       └── QueryHandlerInterface.php
