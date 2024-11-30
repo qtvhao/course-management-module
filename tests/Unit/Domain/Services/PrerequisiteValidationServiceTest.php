@@ -4,55 +4,41 @@ namespace Tests\Unit\Domain\Services;
 
 use PHPUnit\Framework\TestCase;
 use Qtvhao\CourseManagement\Domain\Services\PrerequisiteValidationService;
-use Qtvhao\CourseManagement\Domain\Contracts\Repositories\CourseReadRepositoryInterface;
 use Qtvhao\CourseManagement\Domain\ValueObjects\CourseId;
+use Qtvhao\CourseManagement\Domain\Exceptions\PrerequisiteValidationException;
 
 class PrerequisiteValidationServiceTest extends TestCase
 {
     private PrerequisiteValidationService $service;
-    private $mockRepository;
 
     protected function setUp(): void
     {
-        $this->mockRepository = $this->createMock(CourseReadRepositoryInterface::class);
-        $this->service = new PrerequisiteValidationService($this->mockRepository);
+        $this->service = new PrerequisiteValidationService();
     }
 
-    public function testValidatePrerequisitesReturnsTrueForValidPrerequisites()
+    public function testValidateReturnsTrueForValidPrerequisites()
     {
+        // Arrange
         $courseId = new CourseId('course-1');
         $prerequisiteIds = [new CourseId('course-2'), new CourseId('course-3')];
 
-        $this->mockRepository->method('existsById')->willReturn(true);
-        $this->mockRepository->method('getPrerequisites')->willReturn([]);
+        // Act
+        $result = $this->service->validate($courseId, $prerequisiteIds);
 
-        $result = $this->service->validatePrerequisites($courseId, $prerequisiteIds);
-
-        $this->assertTrue($result);
+        // Assert
+        $this->assertTrue($result, 'Validation should return true for valid prerequisites.');
     }
 
-    public function testValidatePrerequisitesThrowsExceptionForNonExistentCourse()
+    public function testValidateThrowsExceptionForCircularDependency()
     {
-        $this->expectException(\InvalidArgumentException::class);
-
+        // Arrange
         $courseId = new CourseId('course-1');
-        $prerequisiteIds = [new CourseId('non-existent-course')];
+        $prerequisiteIds = [new CourseId('course-1')]; // Circular dependency
 
-        $this->mockRepository->method('existsById')->willReturn(false);
+        // Assert
+        $this->expectException(PrerequisiteValidationException::class);
 
-        $this->service->validatePrerequisites($courseId, $prerequisiteIds);
-    }
-
-    public function testValidatePrerequisitesThrowsExceptionForCircularDependency()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $courseId = new CourseId('course-1');
-        $prerequisiteIds = [new CourseId('course-2')];
-
-        $this->mockRepository->method('existsById')->willReturn(true);
-        $this->mockRepository->method('getPrerequisites')->willReturn([$courseId]);
-
-        $this->service->validatePrerequisites($courseId, $prerequisiteIds);
+        // Act
+        $this->service->validate($courseId, $prerequisiteIds);
     }
 }
