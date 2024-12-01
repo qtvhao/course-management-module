@@ -243,4 +243,15 @@ interface EventBusInterface
     public function subscribe(string $eventClass, callable $handler): void;
 }
 
+interface EventHandlerInterface
+{
+    /**
+     * Handle the given domain event.
+     *
+     * @param object $event
+     * @return void
+     */
+    public function handle(object $event): void;
+}
+
 ```
