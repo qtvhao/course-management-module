@@ -197,6 +197,8 @@ assessment-management-module/  // Another module (details omitted)
 learning-system-module/        // Another module (details omitted)
 └── composer.json              // Dependency management for this module
 
+---
+
 interface AggregateRootInterface
 {
     /**
