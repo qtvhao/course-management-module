@@ -1,184 +1,195 @@
-Phân tách trách nhiệm cho task “Cập nhật prerequisite của một khóa học” theo CQRS, DDD và Clean Architecture
+Để mở rộng chức năng của UpdateCoursePrerequisiteHandler theo CQRS, DDD, và Clean Architecture, sử dụng phương pháp releaseEvents(), ta sẽ bổ sung logic xử lý các sự kiện domain được phát sinh trong quá trình cập nhật prerequisites.
 
-1. Tổng quan các thành phần:
+Bước 1: Thiết kế releaseEvents trong Aggregate
 
-	•	QueueCommandBus:
-Đóng vai trò làm trung gian để gửi và xử lý các Command. Nó đảm bảo rằng các Command được xử lý không đồng bộ, và việc cập nhật hệ thống không gây gián đoạn.
-	•	Command:
-Là dữ liệu đơn thuần, chứa các thông tin cần thiết để thực thi task “cập nhật prerequisite”. Không chứa logic xử lý.
-	•	CommandHandler:
-Xử lý logic nghiệp vụ để thực hiện task dựa trên dữ liệu từ Command. Nó tương tác với domain (Aggregate Root, Repository).
-	•	UseCase:
-Là lớp điều phối (orchestrator), tập hợp các bước cần thiết để thực hiện yêu cầu nghiệp vụ cụ thể. Nó tạo Command, gửi tới QueueCommandBus và thực thi quy trình.
+Aggregate (CourseAggregate)
 
-2. Cách phân tách trách nhiệm:
+Aggregate sẽ quản lý các sự kiện được ghi lại trong quá trình xử lý logic domain.
 
-2.1. Command
-
-	•	Trách nhiệm:
-Đại diện cho yêu cầu “Cập nhật prerequisite của một khóa học” dưới dạng dữ liệu thuần.
-	•	Ví dụ: Khóa học courseId, danh sách điều kiện tiên quyết mới prerequisites, và thông tin về người thực hiện updatedBy.
-	•	Ví dụ triển khai:
-
-namespace App\Application\Commands;
-
-class UpdatePrerequisiteCommand
+```php
+class CourseAggregate implements AggregateRootInterface
 {
-    public function __construct(
-        public readonly string $courseId,
-        public readonly array $prerequisites,
-        public readonly string $updatedBy
-    ) {}
-}
+    private array $domainEvents = []; // Store domain events.
 
-2.2. CommandHandler
-
-	•	Trách nhiệm:
-Xử lý nghiệp vụ khi nhận được UpdatePrerequisiteCommand.
-Tương tác với Aggregate Root (CourseAggregate), cập nhật trạng thái và sử dụng Repository để lưu trạng thái mới.
-	•	Ví dụ triển khai:
-
-namespace App\Application\CommandHandlers;
-
-use App\Domain\Aggregates\CourseAggregate;
-use App\Domain\Contracts\Repositories\CourseWriteRepositoryInterface;
-use App\Application\Commands\UpdatePrerequisiteCommand;
-
-class UpdatePrerequisiteHandler
-{
-    public function __construct(
-        private CourseWriteRepositoryInterface $repository
-    ) {}
-
-    public function handle(UpdatePrerequisiteCommand $command): void
+    public function updatePrerequisites(array $prerequisiteIds): void
     {
-        // Load the aggregate root
+        if ($this->arePrerequisitesValid($prerequisiteIds)) {
+            $this->prerequisites = $prerequisiteIds;
+
+            // Record domain event.
+            $this->recordEvent(new PrerequisitesUpdatedEvent($this->id, $prerequisiteIds));
+        } else {
+            throw new InvalidPrerequisiteException("Invalid prerequisites provided.");
+        }
+    }
+
+    public function recordEvent(DomainEvent $event): void
+    {
+        $this->domainEvents[] = $event;
+    }
+
+    public function releaseEvents(): array
+    {
+        $events = $this->domainEvents;
+        $this->domainEvents = []; // Clear recorded events after releasing.
+        return $events;
+    }
+}
+```
+
+Bước 2: Mở rộng UpdateCoursePrerequisiteHandler
+
+Command Handler
+
+UpdateCoursePrerequisiteHandler sẽ xử lý lệnh cập nhật và phát hành các sự kiện domain thông qua releaseEvents().
+
+```php
+class UpdateCoursePrerequisiteHandler
+{
+    public function __construct(
+        private CourseWriteRepositoryInterface $repository,
+        private EventBusInterface $eventBus // Event bus để phát hành sự kiện.
+    ) {}
+
+    public function handle(UpdatePrerequisitesCommand $command): void
+    {
+        // Load the aggregate root (Course) from repository.
         $course = $this->repository->findById($command->courseId);
 
-        // Apply the business logic
-        $course->updatePrerequisites($command->prerequisites, $command->updatedBy);
+        if (!$course) {
+            throw new NotFoundException("Course not found.");
+        }
 
-        // Persist the changes
+        // Update prerequisites using domain logic.
+        $course->updatePrerequisites($command->prerequisiteIds);
+
+        // Persist changes in the repository.
         $this->repository->save($course);
+
+        // Release and publish domain events.
+        foreach ($course->releaseEvents() as $event) {
+            $this->eventBus->publish($event);
+        }
     }
 }
+```
 
-2.3. QueueCommandBus
+Bước 3: Triển khai Event Handling
 
-	•	Trách nhiệm:
-Điều phối Command từ UseCase đến CommandHandler.
-Nó sử dụng hàng đợi (queue) để xử lý lệnh không đồng bộ, phù hợp với CQRS khi viết và đọc được tách biệt.
-	•	Ví dụ triển khai:
+Các sự kiện domain sẽ được phát hành và xử lý bởi các event handlers.
 
-namespace App\Infrastructure\Messaging;
+Domain Event
 
-use App\Application\Contracts\CommandBusInterface;
+Sự kiện đại diện cho việc cập nhật prerequisites:
 
-class QueueCommandBus implements CommandBusInterface
-{
-    public function dispatch(object $command): void
-    {
-        // Dispatch the command to the queue for asynchronous handling
-        // For example, using Laravel Queues:
-        dispatch(function () use ($command) {
-            // Resolve the handler dynamically and execute it
-            $handler = $this->resolveHandler($command);
-            $handler->handle($command);
-        });
-    }
-
-    private function resolveHandler(object $command): object
-    {
-        // Logic to find the appropriate handler for the command
-        $handlerClass = str_replace('Command', 'Handler', get_class($command));
-        return app($handlerClass);
-    }
-}
-
-2.4. UseCase
-
-	•	Trách nhiệm:
-Điều phối nghiệp vụ cấp cao.
-Xác minh dữ liệu đầu vào từ người dùng, tạo Command, và gửi nó tới QueueCommandBus.
-	•	Ví dụ triển khai:
-
-namespace App\Application\UseCases;
-
-use App\Application\Contracts\CommandBusInterface;
-use App\Application\Commands\UpdatePrerequisiteCommand;
-use App\Application\DTOs\UpdatePrerequisiteDTO;
-
-class UpdatePrerequisiteUseCase
+```php
+class PrerequisitesUpdatedEvent extends DomainEvent
 {
     public function __construct(
-        private CommandBusInterface $commandBus
+        public string $courseId,
+        public array $prerequisiteIds
     ) {}
-
-    public function execute(UpdatePrerequisiteDTO $dto): void
-    {
-        // Validate the input (optional)
-        if (empty($dto->prerequisites)) {
-            throw new \InvalidArgumentException('Prerequisites cannot be empty');
-        }
-
-        // Create the command
-        $command = new UpdatePrerequisiteCommand(
-            $dto->courseId,
-            $dto->prerequisites,
-            $dto->updatedBy
-        );
-
-        // Dispatch the command
-        $this->commandBus->dispatch($command);
-    }
 }
+```
 
-2.5. Các thành phần Domain liên quan
+Event Handlers
 
-	•	Aggregate Root (CourseAggregate):
-	•	Cung cấp phương thức updatePrerequisites để cập nhật prerequisite.
-	•	Ghi lại sự kiện domain (PrerequisiteUpdatedEvent).
+Xử lý các hành động liên quan khi sự kiện xảy ra:
+	1.	Gửi Email:
 
-namespace App\Domain\Aggregates;
-
-use App\Domain\Events\PrerequisiteUpdatedEvent;
-
-class CourseAggregate
+```php
+class SendNotificationOnPrerequisitesUpdated
 {
-    private string $id;
-    private array $prerequisites = [];
-
-    public function updatePrerequisites(array $newPrerequisites, string $updatedBy): void
+    public function handle(PrerequisitesUpdatedEvent $event): void
     {
-        // Business rule validation (e.g., no circular prerequisites)
-        $this->validatePrerequisites($newPrerequisites);
+        // Logic to send email notification.
+        echo "Notification sent for course {$event->courseId}";
+    }
+}
+```
 
-        // Update the prerequisites
-        $this->prerequisites = $newPrerequisites;
 
-        // Record the domain event
-        $this->recordEvent(new PrerequisiteUpdatedEvent($this->id, $newPrerequisites, $updatedBy));
+	2.	Cập nhật Cache:
+
+class UpdateCacheOnPrerequisitesUpdated
+{
+    public function handle(PrerequisitesUpdatedEvent $event): void
+    {
+        // Logic to update cache.
+        echo "Cache updated for course {$event->courseId}";
+    }
+}
+
+
+
+EventBus Interface:
+
+Event bus sẽ phát hành sự kiện đến các handler:
+
+interface EventBusInterface
+{
+    public function publish(DomainEvent $event): void;
+    public function subscribe(string $eventClass, callable $handler): void;
+}
+
+Bước 4: Đăng ký Event Handlers
+
+Event Dispatcher:
+
+Cần đảm bảo các handler được đăng ký để xử lý các sự kiện:
+
+```php
+class InMemoryEventBus implements EventBusInterface
+{
+    private array $handlers = [];
+
+    public function subscribe(string $eventClass, callable $handler): void
+    {
+        $this->handlers[$eventClass][] = $handler;
     }
 
-    private function validatePrerequisites(array $prerequisites): void
+    public function publish(DomainEvent $event): void
     {
-        // Custom validation logic
-        if (in_array($this->id, $prerequisites)) {
-            throw new \DomainException('A course cannot be its own prerequisite.');
+        $eventClass = get_class($event);
+        if (!empty($this->handlers[$eventClass])) {
+            foreach ($this->handlers[$eventClass] as $handler) {
+                $handler($event);
+            }
         }
     }
 }
 
-3. Quy trình phối hợp
 
-	1.	UseCase nhận dữ liệu từ người dùng, thực hiện kiểm tra cơ bản, và tạo UpdatePrerequisiteCommand.
-	2.	UseCase gửi Command tới QueueCommandBus.
-	3.	QueueCommandBus đẩy Command lên hàng đợi để xử lý không đồng bộ.
-	4.	CommandHandler nhận lệnh từ hàng đợi, thực thi logic nghiệp vụ qua Aggregate Root (CourseAggregate).
-	5.	Repository lưu trạng thái mới vào cơ sở dữ liệu.
+// Registration example.
+$eventBus = new InMemoryEventBus();
+$eventBus->subscribe(PrerequisitesUpdatedEvent::class, [new SendNotificationOnPrerequisitesUpdated(), 'handle']);
+$eventBus->subscribe(PrerequisitesUpdatedEvent::class, [new UpdateCacheOnPrerequisitesUpdated(), 'handle']);
+```
 
-4. Đáp ứng nguyên tắc
+Bước 5: Kiến trúc tổng thể
 
-	•	CQRS: Việc cập nhật trạng thái (Command) được tách biệt hoàn toàn khỏi việc truy vấn dữ liệu.
-	•	DDD: Nghiệp vụ được đặt tại Aggregate Root và thể hiện qua Domain Events.
-	•	Clean Architecture: Từng lớp (Domain, Application, Infrastructure) có trách nhiệm rõ ràng, không phụ thuộc chéo.
+	1.	Presentation Layer:
+	•	API nhận lệnh cập nhật từ client và chuyển đến UpdateCoursePrerequisiteHandler.
+	2.	Application Layer:
+	•	UpdateCoursePrerequisiteHandler thực hiện cập nhật và phát hành sự kiện.
+	3.	Domain Layer:
+	•	Aggregate (CourseAggregate) thực hiện logic cập nhật và ghi nhận sự kiện.
+	•	Các sự kiện được phát hành qua releaseEvents().
+	4.	Infrastructure Layer:
+	•	Repository cập nhật database.
+	•	Event bus phát hành sự kiện và gọi các handler (như gửi email, cập nhật cache).
+
+Kết quả
+
+Với thiết kế trên:
+	•	Tính tách biệt trách nhiệm (Separation of Concerns) được đảm bảo.
+	•	Sự kiện domain (PrerequisitesUpdatedEvent) cung cấp cách tiếp cận event-driven để mở rộng chức năng mà không làm phức tạp handler.
+	•	Hệ thống dễ dàng mở rộng thêm các handler mới khi cần xử lý các hành động khác, ví dụ: ghi log, đồng bộ hóa với hệ thống khác.
+
+Dòng xử lý tổng quan:
+
+	1.	API -> Gửi UpdatePrerequisitesCommand.
+	2.	UpdateCoursePrerequisiteHandler -> Cập nhật Aggregate, phát hành sự kiện domain.
+	3.	Event bus -> Gọi các handler xử lý sự kiện.
+	4.	Handlers -> Gửi email, cập nhật cache, hoặc thực hiện các hành động khác.
+ 
