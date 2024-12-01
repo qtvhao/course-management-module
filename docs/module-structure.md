@@ -214,4 +214,12 @@ interface AggregateRootInterface
     public function recordEvent(DomainEvent $event): void;
 }
 
+interface CommandBusInterface
+{
+    /**
+     * Dispatch a command to its handler.
+     */
+    public function dispatch(object $command, $priority): void;
+}
+
 ```
