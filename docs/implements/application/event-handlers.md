@@ -11,12 +11,13 @@ Bảng 1: Event Handlers Không Tuân Thủ Quy Tắc
 
 Bảng 2: Event Handlers Tuân Thủ Quy Tắc
 
-Event Handler	Lý Do Tuân Thủ Quy Tắc
-SendEmailOnCourseCreated	- Có một trách nhiệm duy nhất: gửi email thông báo.  - Không chứa logic gửi email trực tiếp, mà sử dụng một service (e.g., NotificationService).
-UpdateCacheOnCourseUpdated	- Xử lý duy nhất việc cập nhật cache.  - Tương tác với hệ thống cache qua abstraction (CacheServiceInterface), không phụ thuộc trực tiếp vào implementation cụ thể.
-LogCourseCreatedEvent	- Đảm bảo ghi log một cách độc lập, không can thiệp logic business.  - Hoàn toàn phụ thuộc vào LoggerInterface, đảm bảo tính linh hoạt và khả năng mở rộng.
-TriggerApprovalWorkflowOnCourseCreated	- Không chứa logic phức tạp của workflow.  - Giao trách nhiệm khởi chạy workflow cho một WorkflowServiceInterface, đảm bảo handler chỉ làm nhiệm vụ trigger.
-ClearCourseCacheOnCourseDeleted	- Có một trách nhiệm duy nhất là xóa dữ liệu cache liên quan.  - Hoạt động như một thành phần kỹ thuật phụ thuộc abstraction (CacheServiceInterface), đảm bảo không vi phạm nguyên tắc phân tầng.
+| Event Handler                     		| Lý Do Tuân Thủ Quy Tắc                                                                                       																								|
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| SendEmailOnCourseCreated          		| - Có một trách nhiệm duy nhất: gửi email thông báo. <br /> - Không chứa logic gửi email trực tiếp, mà sử dụng một service (e.g., NotificationService). 													|
+| UpdateCacheOnCourseUpdated        		| - Xử lý duy nhất việc cập nhật cache. <br /> - Tương tác với hệ thống cache qua abstraction (CacheServiceInterface), không phụ thuộc trực tiếp vào implementation cụ thể. 								|
+| LogCourseCreatedEvent             		| - Đảm bảo ghi log một cách độc lập, không can thiệp logic business. <br /> - Hoàn toàn phụ thuộc vào LoggerInterface, đảm bảo tính linh hoạt và khả năng mở rộng. 										|
+| TriggerApprovalWorkflowOnCourseCreated 	| - Không chứa logic phức tạp của workflow. <br /> - Giao trách nhiệm khởi chạy workflow cho một WorkflowServiceInterface, đảm bảo handler chỉ làm nhiệm vụ trigger. 										|
+| ClearCourseCacheOnCourseDeleted   		| - Có một trách nhiệm duy nhất là xóa dữ liệu cache liên quan. <br /> - Hoạt động như một thành phần kỹ thuật phụ thuộc abstraction (CacheServiceInterface), đảm bảo không vi phạm nguyên tắc phân tầng. 	|
 
 ### Giải Thích và Kết Luận
 
