@@ -18,18 +18,19 @@ LogCourseCreatedEvent	- Đảm bảo ghi log một cách độc lập, không ca
 TriggerApprovalWorkflowOnCourseCreated	- Không chứa logic phức tạp của workflow.  - Giao trách nhiệm khởi chạy workflow cho một WorkflowServiceInterface, đảm bảo handler chỉ làm nhiệm vụ trigger.
 ClearCourseCacheOnCourseDeleted	- Có một trách nhiệm duy nhất là xóa dữ liệu cache liên quan.  - Hoạt động như một thành phần kỹ thuật phụ thuộc abstraction (CacheServiceInterface), đảm bảo không vi phạm nguyên tắc phân tầng.
 
-Giải Thích và Kết Luận
+### Giải Thích và Kết Luận
 
-	1.	Event Handlers Không Tuân Thủ:
-	•	Các handler này vi phạm nguyên tắc kiến trúc chủ yếu do:
-	•	Chứa logic domain.
-	•	Phụ thuộc vào cụ thể (tight coupling).
-	•	Xử lý nhiều trách nhiệm.
-	•	Giải pháp thay thế: sử dụng Domain Services, Use Cases, và các interface abstraction.
-	2.	Event Handlers Tuân Thủ:
-	•	Các handler này thực hiện đúng vai trò của mình, đảm bảo:
-	•	Single Responsibility: chỉ thực hiện một nhiệm vụ.
-	•	Dependency Inversion: phụ thuộc vào interface thay vì implementation cụ thể.
-	•	Separation of Concerns: không chứa logic thuộc về Domain layer.
+1. **Event Handlers Không Tuân Thủ:**
+	- Các handler này vi phạm nguyên tắc kiến trúc chủ yếu do:
+	  - Chứa logic domain.
+	  - Phụ thuộc vào cụ thể (tight coupling).
+	  - Xử lý nhiều trách nhiệm.
+	- Giải pháp thay thế: sử dụng Domain Services, Use Cases, và các interface abstraction.
+
+2. **Event Handlers Tuân Thủ:**
+	- Các handler này thực hiện đúng vai trò của mình, đảm bảo:
+	  - Single Responsibility: chỉ thực hiện một nhiệm vụ.
+	  - Dependency Inversion: phụ thuộc vào interface thay vì implementation cụ thể.
+	  - Separation of Concerns: không chứa logic thuộc về Domain layer.
 
 Khi thiết kế hệ thống, nên tập trung xây dựng các handler nhỏ gọn, tách biệt trách nhiệm và sử dụng abstraction để tránh vi phạm các nguyên tắc kiến trúc. 🚀
