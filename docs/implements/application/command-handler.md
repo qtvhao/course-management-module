@@ -95,7 +95,7 @@ class PrerequisitesUpdatedEvent extends DomainEvent
 Event Handlers
 
 Xử lý các hành động liên quan khi sự kiện xảy ra:
-	1.	Gửi Email:
+1.	Gửi Email:
 
 ```php
 class SendNotificationOnPrerequisitesUpdated
@@ -109,7 +109,7 @@ class SendNotificationOnPrerequisitesUpdated
 ```
 
 
-	2.	Cập nhật Cache:
+2.	Cập nhật Cache:
 
 ```php
 class UpdateCacheOnPrerequisitesUpdated
