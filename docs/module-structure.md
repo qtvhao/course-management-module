@@ -45,13 +45,13 @@ course-management-module/
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
 │   │   │   └── DeleteCourseCommand.php
-│   │   ├── Contracts/
-│   │   │   ├── CommandBusInterface.php
-│   │   │   └── EventHandlerInterface.php
 │   │   ├── CommandHandlers/       // Command handlers
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
 │   │   │   └── DeleteCourseHandler.php
+│   │   ├── Contracts/
+│   │   │   ├── CommandBusInterface.php
+│   │   │   └── EventHandlerInterface.php
 │   │   ├── DataQueries/           // Data structures for read operations
 │   │   │   ├── Criteria/          // Query criteria
 │   │   │   │   ├── CourseCriteria.php
