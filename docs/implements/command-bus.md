@@ -31,16 +31,18 @@ Luồng Hoạt Động của Command Bus
 Ví Dụ Triển Khai Command Bus
 
 Interface for Command Bus
-
+```php
 namespace Qtvhao\CourseManagement\Application\Contracts;
 
 interface CommandBusInterface
 {
     public function dispatch(object $command): void;
 }
+```
 
 Simple Command Bus Implementation
 
+```php
 namespace Qtvhao\CourseManagement\Infrastructure\Messaging;
 
 use Qtvhao\CourseManagement\Application\Contracts\CommandBusInterface;
@@ -66,6 +68,7 @@ class SimpleCommandBus implements CommandBusInterface
         $handler($command);
     }
 }
+```
 
 Tích Hợp Command Bus với Application Layer
 
