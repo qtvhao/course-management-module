@@ -196,4 +196,22 @@ assessment-management-module/  // Another module (details omitted)
 learning-system-module/        // Another module (details omitted)
 └── composer.json              // Dependency management for this module
 
+interface AggregateRootInterface
+{
+    /**
+     * Release all domain events that were recorded by the aggregate.
+     *
+     * @return DomainEvent[]
+     */
+    public function releaseEvents(): array;
+
+    /**
+     * Record a new domain event.
+     *
+     * @param DomainEvent $event
+     * @return void
+     */
+    public function recordEvent(DomainEvent $event): void;
+}
+
 ```
