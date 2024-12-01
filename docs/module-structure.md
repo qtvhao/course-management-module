@@ -62,14 +62,17 @@ course-management-module/
 │   │   │   │   └── SortingCriteria.php
 │   │   │   ├── GetCourseByIdQuery.php
 │   │   │   ├── GetAllCoursesQuery.php
+│   │   │   ├── GetPaginatedCoursesQuery.php
 │   │   │   └── SearchCoursesQuery.php
 │   │   ├── QueryHandlers/         // Handlers for queries
 │   │   │   ├── GetCourseByIdHandler.php
 │   │   │   ├── GetAllCoursesHandler.php
+│   │   │   ├── GetPaginatedCoursesHandler.php
 │   │   │   └── SearchCoursesHandler.php
 │   │   ├── DTOs/                  // Data transfer objects
 │   │   │   ├── CourseDTO.php
 │   │   │   ├── CourseSummaryDTO.php
+│   │   │   ├── PaginatedCoursesDTO.php
 │   │   │   └── CourseReadModel.php
 │   │   ├── EventHandlers/         // Event handling logic
 │   │   │   ├── SendEmailOnCourseCreated.php
