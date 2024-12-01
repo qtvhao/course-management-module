@@ -109,14 +109,6 @@ course-management-module/
 │   │   │   ├── CreateCourseRequest.php
 │   │   │   ├── UpdateCourseRequest.php
 │   │   │   └── DeleteCourseRequest.php
-│   │   ├── Resources/             // Views, translations, and static files
-│   │   │   ├── views/
-│   │   │   │   ├── index.blade.php
-│   │   │   │   ├── create.blade.php
-│   │   │   │   └── edit.blade.php
-│   │   │   └── lang/
-│   │   │       └── en/
-│   │   │           └── courses.php
 │   │   └── Routes/                // Route definitions (web and API)
 │   │       ├── web.php
 │   │       └── api.php
