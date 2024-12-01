@@ -222,4 +222,24 @@ interface CommandBusInterface
     public function dispatch(object $command, $priority): void;
 }
 
+interface EventBusInterface
+{
+    /**
+     * Publish a single event to be handled.
+     *
+     * @param object $event
+     * @return void
+     */
+    public function publish(object $event): void;
+
+    /**
+     * Register an event handler for a specific event.
+     *
+     * @param string $eventClass
+     * @param callable $handler
+     * @return void
+     */
+    public function subscribe(string $eventClass, callable $handler): void;
+}
+
 ```
