@@ -1,216 +1,184 @@
-Mở rộng chức năng của UpdateCoursePrerequisiteHandler
+Phân tách trách nhiệm cho task “Cập nhật prerequisite của một khóa học” theo CQRS, DDD và Clean Architecture
 
-Dưới đây là các cách mở rộng UpdateCoursePrerequisiteHandler để xử lý nghiệp vụ cập nhật prerequisites (điều kiện tiên quyết) của khóa học một cách mạnh mẽ hơn:
+1. Tổng quan các thành phần:
 
-1. Xác minh các prerequisites có tồn tại
+	•	QueueCommandBus:
+Đóng vai trò làm trung gian để gửi và xử lý các Command. Nó đảm bảo rằng các Command được xử lý không đồng bộ, và việc cập nhật hệ thống không gây gián đoạn.
+	•	Command:
+Là dữ liệu đơn thuần, chứa các thông tin cần thiết để thực thi task “cập nhật prerequisite”. Không chứa logic xử lý.
+	•	CommandHandler:
+Xử lý logic nghiệp vụ để thực hiện task dựa trên dữ liệu từ Command. Nó tương tác với domain (Aggregate Root, Repository).
+	•	UseCase:
+Là lớp điều phối (orchestrator), tập hợp các bước cần thiết để thực hiện yêu cầu nghiệp vụ cụ thể. Nó tạo Command, gửi tới QueueCommandBus và thực thi quy trình.
 
-Trước khi cập nhật, cần kiểm tra tất cả các điều kiện tiên quyết mới đều tồn tại trong hệ thống, tránh tham chiếu tới các khóa học không tồn tại.
+2. Cách phân tách trách nhiệm:
 
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Bước 1: Xác minh prerequisites tồn tại
-    $nonexistentPrerequisites = $this->courseWriteRepository->findNonexistentPrerequisites($command->newPrerequisites);
-    if (!empty($nonexistentPrerequisites)) {
-        throw new ValidationException('Các khóa học không tồn tại: ' . implode(', ', $nonexistentPrerequisites));
-    }
+2.1. Command
 
-    // Tiếp tục logic cũ
-}
+	•	Trách nhiệm:
+Đại diện cho yêu cầu “Cập nhật prerequisite của một khóa học” dưới dạng dữ liệu thuần.
+	•	Ví dụ: Khóa học courseId, danh sách điều kiện tiên quyết mới prerequisites, và thông tin về người thực hiện updatedBy.
+	•	Ví dụ triển khai:
 
-2. Kiểm tra vòng lặp điều kiện tiên quyết
+namespace App\Application\Commands;
 
-Ngăn chặn vòng lặp trong các điều kiện tiên quyết, ví dụ: Khóa A yêu cầu Khóa B, nhưng Khóa B lại yêu cầu Khóa A.
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Bước 2: Kiểm tra vòng lặp điều kiện tiên quyết
-    if ($this->validationService->hasCircularDependency($command->courseId, $command->newPrerequisites)) {
-        throw new ValidationException('Phát hiện vòng lặp trong các điều kiện tiên quyết.');
-    }
-
-    // Tiếp tục logic cũ
-}
-
-3. Phát hành sự kiện miền (Domain Event)
-
-Sau khi cập nhật, phát hành sự kiện miền CoursePrerequisitesUpdatedEvent để các hệ thống khác có thể xử lý (ví dụ: cập nhật cache, thông báo).
-
-use App\Events\CoursePrerequisitesUpdatedEvent;
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Logic cũ...
-
-    // Bước 3: Phát hành sự kiện miền
-    $event = new CoursePrerequisitesUpdatedEvent($course->getId(), $command->newPrerequisites);
-    $this->eventBus->publish($event);
-}
-
-4. Ghi log thay đổi để audit
-
-Ghi lại thông tin ai đã thực hiện thay đổi, khi nào thay đổi, và chi tiết nội dung thay đổi để phục vụ việc kiểm tra sau này.
-
-use App\Logging\AuditLogger;
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Logic cũ...
-
-    // Bước 4: Ghi log
-    AuditLogger::log(
-        'CoursePrerequisiteUpdated',
-        [
-            'courseId' => $command->courseId,
-            'newPrerequisites' => $command->newPrerequisites,
-            'updatedBy' => auth()->user()->id, // Ví dụ: ID người dùng hiện tại
-        ]
-    );
-}
-
-5. Cập nhật cache
-
-Nếu ứng dụng sử dụng cache, cần đảm bảo dữ liệu cache liên quan đến khóa học được làm mới sau khi cập nhật.
-
-use App\Cache\CourseCache;
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Logic cũ...
-
-    // Bước 5: Làm mới cache
-    CourseCache::invalidate($command->courseId);
-}
-
-6. Gửi thông báo
-
-Thông báo cho các bên liên quan (giảng viên, học viên, quản trị viên) về thay đổi điều kiện tiên quyết của khóa học.
-
-use App\Services\NotificationService;
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Logic cũ...
-
-    // Bước 6: Gửi thông báo
-    NotificationService::notifyUsers(
-        $course->getEnrolledUsers(),
-        'Điều kiện tiên quyết của khóa học đã được cập nhật.',
-        [
-            'courseId' => $course->getId(),
-            'prerequisites' => $command->newPrerequisites,
-        ]
-    );
-}
-
-7. Hỗ trợ cập nhật một phần (Partial Update)
-
-Cho phép chỉ thêm hoặc xóa một số điều kiện tiên quyết mà không cần ghi đè toàn bộ danh sách.
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Bước 7: Hợp nhất (merge) các điều kiện tiên quyết
-    $currentPrerequisites = $course->getPrerequisites();
-
-    // Logic hợp nhất (ví dụ: thêm hoặc ghi đè dựa trên flag trong command)
-    $updatedPrerequisites = array_merge($currentPrerequisites, $command->newPrerequisites);
-
-    // Loại bỏ trùng lặp và tiếp tục
-    $course->updatePrerequisites(array_unique($updatedPrerequisites));
-
-    // Lưu khóa học
-    $this->courseWriteRepository->save($course);
-}
-
-8. Rollback nếu có lỗi
-
-Đảm bảo nếu bất kỳ bước nào trong quá trình xử lý gặp lỗi, tất cả thay đổi trước đó đều được hoàn tác (rollback).
-
-use Illuminate\Support\Facades\DB;
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    DB::beginTransaction();
-
-    try {
-        // Logic xử lý...
-
-        DB::commit();
-    } catch (\Exception $e) {
-        DB::rollBack();
-        throw $e;
-    }
-}
-
-9. Tách riêng logic kiểm tra
-
-Tách các logic kiểm tra (validation) thành các dịch vụ riêng biệt để dễ dàng bảo trì và tái sử dụng.
-
-public function handle(UpdateCoursePrerequisiteCommand $command): void
-{
-    // Validate prerequisites tồn tại
-    $this->validationService->validatePrerequisitesExist($command->newPrerequisites);
-
-    // Kiểm tra vòng lặp điều kiện tiên quyết
-    $this->validationService->validateNoCircularDependencies($command->courseId, $command->newPrerequisites);
-
-    // Tiếp tục xử lý...
-}
-
-Handler hoàn chỉnh
-
-class UpdateCoursePrerequisiteHandler implements CommandHandlerInterface
+class UpdatePrerequisiteCommand
 {
     public function __construct(
-        private CourseWriteRepositoryInterface $courseWriteRepository,
-        private PrerequisiteValidationService $validationService,
-        private EventBusInterface $eventBus,
-        private NotificationService $notificationService,
-        private CacheService $cacheService
+        public readonly string $courseId,
+        public readonly array $prerequisites,
+        public readonly string $updatedBy
+    ) {}
+}
+
+2.2. CommandHandler
+
+	•	Trách nhiệm:
+Xử lý nghiệp vụ khi nhận được UpdatePrerequisiteCommand.
+Tương tác với Aggregate Root (CourseAggregate), cập nhật trạng thái và sử dụng Repository để lưu trạng thái mới.
+	•	Ví dụ triển khai:
+
+namespace App\Application\CommandHandlers;
+
+use App\Domain\Aggregates\CourseAggregate;
+use App\Domain\Contracts\Repositories\CourseWriteRepositoryInterface;
+use App\Application\Commands\UpdatePrerequisiteCommand;
+
+class UpdatePrerequisiteHandler
+{
+    public function __construct(
+        private CourseWriteRepositoryInterface $repository
     ) {}
 
-    public function handle(UpdateCoursePrerequisiteCommand $command): void
+    public function handle(UpdatePrerequisiteCommand $command): void
     {
-        DB::beginTransaction();
+        // Load the aggregate root
+        $course = $this->repository->findById($command->courseId);
 
-        try {
-            // Xác minh prerequisites tồn tại
-            $this->validationService->validatePrerequisitesExist($command->newPrerequisites);
+        // Apply the business logic
+        $course->updatePrerequisites($command->prerequisites, $command->updatedBy);
 
-            // Kiểm tra vòng lặp
-            $this->validationService->validateNoCircularDependencies($command->courseId, $command->newPrerequisites);
+        // Persist the changes
+        $this->repository->save($course);
+    }
+}
 
-            // Lấy và cập nhật khóa học
-            $course = $this->courseWriteRepository->findById($command->courseId);
-            if (!$course) {
-                throw new NotFoundException('Không tìm thấy khóa học.');
-            }
+2.3. QueueCommandBus
 
-            $course->updatePrerequisites($command->newPrerequisites);
-            $this->courseWriteRepository->save($course);
+	•	Trách nhiệm:
+Điều phối Command từ UseCase đến CommandHandler.
+Nó sử dụng hàng đợi (queue) để xử lý lệnh không đồng bộ, phù hợp với CQRS khi viết và đọc được tách biệt.
+	•	Ví dụ triển khai:
 
-            // Phát hành sự kiện
-            $this->eventBus->publish(new CoursePrerequisitesUpdatedEvent($course->getId(), $command->newPrerequisites));
+namespace App\Infrastructure\Messaging;
 
-            // Gửi thông báo
-            $this->notificationService->notifyUsers(
-                $course->getEnrolledUsers(),
-                'Điều kiện tiên quyết đã được cập nhật.',
-                ['courseId' => $course->getId()]
-            );
+use App\Application\Contracts\CommandBusInterface;
 
-            // Cập nhật cache
-            $this->cacheService->invalidate($course->getId());
+class QueueCommandBus implements CommandBusInterface
+{
+    public function dispatch(object $command): void
+    {
+        // Dispatch the command to the queue for asynchronous handling
+        // For example, using Laravel Queues:
+        dispatch(function () use ($command) {
+            // Resolve the handler dynamically and execute it
+            $handler = $this->resolveHandler($command);
+            $handler->handle($command);
+        });
+    }
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
+    private function resolveHandler(object $command): object
+    {
+        // Logic to find the appropriate handler for the command
+        $handlerClass = str_replace('Command', 'Handler', get_class($command));
+        return app($handlerClass);
+    }
+}
+
+2.4. UseCase
+
+	•	Trách nhiệm:
+Điều phối nghiệp vụ cấp cao.
+Xác minh dữ liệu đầu vào từ người dùng, tạo Command, và gửi nó tới QueueCommandBus.
+	•	Ví dụ triển khai:
+
+namespace App\Application\UseCases;
+
+use App\Application\Contracts\CommandBusInterface;
+use App\Application\Commands\UpdatePrerequisiteCommand;
+use App\Application\DTOs\UpdatePrerequisiteDTO;
+
+class UpdatePrerequisiteUseCase
+{
+    public function __construct(
+        private CommandBusInterface $commandBus
+    ) {}
+
+    public function execute(UpdatePrerequisiteDTO $dto): void
+    {
+        // Validate the input (optional)
+        if (empty($dto->prerequisites)) {
+            throw new \InvalidArgumentException('Prerequisites cannot be empty');
+        }
+
+        // Create the command
+        $command = new UpdatePrerequisiteCommand(
+            $dto->courseId,
+            $dto->prerequisites,
+            $dto->updatedBy
+        );
+
+        // Dispatch the command
+        $this->commandBus->dispatch($command);
+    }
+}
+
+2.5. Các thành phần Domain liên quan
+
+	•	Aggregate Root (CourseAggregate):
+	•	Cung cấp phương thức updatePrerequisites để cập nhật prerequisite.
+	•	Ghi lại sự kiện domain (PrerequisiteUpdatedEvent).
+
+namespace App\Domain\Aggregates;
+
+use App\Domain\Events\PrerequisiteUpdatedEvent;
+
+class CourseAggregate
+{
+    private string $id;
+    private array $prerequisites = [];
+
+    public function updatePrerequisites(array $newPrerequisites, string $updatedBy): void
+    {
+        // Business rule validation (e.g., no circular prerequisites)
+        $this->validatePrerequisites($newPrerequisites);
+
+        // Update the prerequisites
+        $this->prerequisites = $newPrerequisites;
+
+        // Record the domain event
+        $this->recordEvent(new PrerequisiteUpdatedEvent($this->id, $newPrerequisites, $updatedBy));
+    }
+
+    private function validatePrerequisites(array $prerequisites): void
+    {
+        // Custom validation logic
+        if (in_array($this->id, $prerequisites)) {
+            throw new \DomainException('A course cannot be its own prerequisite.');
         }
     }
 }
 
-Lợi ích
+3. Quy trình phối hợp
 
-	1.	Tính linh hoạt: Các chức năng mở rộng như kiểm tra vòng lặp, log, cache, và thông báo giúp hệ thống đầy đủ hơn.
-	2.	Bảo trì dễ dàng: Tách biệt các logic kiểm tra và sử dụng dịch vụ giúp dễ mở rộng hoặc sửa đổi.
-	3.	Đảm bảo tính nhất quán: Rollback tránh các thay đổi không hoàn chỉnh khi gặp lỗi.
+	1.	UseCase nhận dữ liệu từ người dùng, thực hiện kiểm tra cơ bản, và tạo UpdatePrerequisiteCommand.
+	2.	UseCase gửi Command tới QueueCommandBus.
+	3.	QueueCommandBus đẩy Command lên hàng đợi để xử lý không đồng bộ.
+	4.	CommandHandler nhận lệnh từ hàng đợi, thực thi logic nghiệp vụ qua Aggregate Root (CourseAggregate).
+	5.	Repository lưu trạng thái mới vào cơ sở dữ liệu.
+
+4. Đáp ứng nguyên tắc
+
+	•	CQRS: Việc cập nhật trạng thái (Command) được tách biệt hoàn toàn khỏi việc truy vấn dữ liệu.
+	•	DDD: Nghiệp vụ được đặt tại Aggregate Root và thể hiện qua Domain Events.
+	•	Clean Architecture: Từng lớp (Domain, Application, Infrastructure) có trách nhiệm rõ ràng, không phụ thuộc chéo.
