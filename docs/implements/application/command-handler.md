@@ -111,6 +111,7 @@ class SendNotificationOnPrerequisitesUpdated
 
 	2.	Cập nhật Cache:
 
+```php
 class UpdateCacheOnPrerequisitesUpdated
 {
     public function handle(PrerequisitesUpdatedEvent $event): void
@@ -119,6 +120,7 @@ class UpdateCacheOnPrerequisitesUpdated
         echo "Cache updated for course {$event->courseId}";
     }
 }
+```
 
 
 
@@ -126,12 +128,13 @@ EventBus Interface:
 
 Event bus sẽ phát hành sự kiện đến các handler:
 
+```php
 interface EventBusInterface
 {
     public function publish(DomainEvent $event): void;
     public function subscribe(string $eventClass, callable $handler): void;
 }
-
+```
 ### Bước 4: Đăng ký Event Handlers
 
 Event Dispatcher:
