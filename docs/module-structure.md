@@ -51,6 +51,7 @@ course-management-module/
 │   │   │   └── DeleteCourseCommand.php
 │   │   ├── Contracts/
 │   │   │   ├── CommandBusInterface.php
+│   │   │   └── EventHandlerInterface.php
 │   │   ├── CommandHandlers/       // Command handlers
 │   │   │   ├── CreateCourseHandler.php
 │   │   │   ├── UpdateCourseHandler.php
