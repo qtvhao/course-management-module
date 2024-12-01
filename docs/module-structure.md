@@ -41,10 +41,6 @@ course-management-module/
 │   │       ├── AuthorizationService.php
 │   │       └── ...
 │   ├── Application/               // Application logic for use cases and queries
-│   │   ├── UseCases/              // Specific use cases (create, update, delete)
-│   │   │   ├── CreateCourseUseCase.php
-│   │   │   ├── UpdateCourseUseCase.php
-│   │   │   └── DeleteCourseUseCase.php
 │   │   ├── Commands/              // Data structures for command operations
 │   │   │   ├── CreateCourseCommand.php
 │   │   │   ├── UpdateCourseCommand.php
