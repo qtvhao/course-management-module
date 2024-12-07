@@ -1,7 +1,6 @@
 Dưới đây là cấu trúc module “Quản lý khóa học” (Course Management)
 
 ```plaintext
-This module structure adhered DDD, Clean Architecture, CQRS?
 course-management-module/
 ├── composer.json                  // Dependency configuration, autoloading Qtvhao\CourseManagement namespace
 ├── docs/
@@ -243,5 +242,66 @@ interface EventHandlerInterface
      */
     public function handle(object $event): void;
 }
+
+### **Tóm Tắt Kiến Trúc Module Structure**
+
+Module structure được thiết kế dựa trên các nguyên tắc kiến trúc phần mềm hiện đại nhằm tạo nên một hệ thống **dễ bảo trì, mở rộng và linh hoạt**. Các concept cốt lõi được áp dụng như sau:
+
+* * * * *
+
+### **1\. Ports and Adapters Architecture**
+
+-   **Ports** (Contracts/Interfaces): Định nghĩa cách hệ thống tương tác với các công cụ bên ngoài, đảm bảo Application Core không phụ thuộc vào implementation cụ thể.
+-   **Adapters** (Infrastructure): Hiện thực hóa Ports, kết nối với các công cụ như database (`EloquentCourseWriteRepository`) hay message queue (`RabbitMQCommandBus`).
+
+* * * * *
+
+### **2\. Domain-Driven Design (DDD)**
+
+-   **Domain Layer**:
+    -   **Entities**: Thực thể miền, đại diện cho dữ liệu và logic chính (e.g., `Course`).
+    -   **Value Objects**: Thuộc tính bất biến như `CourseId` đảm bảo tính toàn vẹn dữ liệu.
+    -   **Domain Events**: Quản lý thay đổi trong miền (e.g., `CourseCreatedEvent`).
+    -   **Domain Services**: Xử lý logic phức tạp, không thuộc về một thực thể nào (e.g., `ScheduleValidationService`).
+
+* * * * *
+
+### **3\. Command-Query Responsibility Segregation (CQRS)**
+
+-   **Commands**: Xử lý các thao tác write (e.g., `CreateCourseCommand`).
+-   **Queries**: Đọc dữ liệu (e.g., `SearchCoursesQuery`).
+-   **Handlers**: Tách riêng logic xử lý của Commands và Queries.
+
+* * * * *
+
+### **4\. Event-Driven Architecture (EDA)**
+
+-   **Event Bus**: Trung gian phân phối các sự kiện giữa các module (e.g., `EventDispatcher`).
+-   **Event Handlers**: Xử lý các side effects như gửi email (`SendEmailOnCourseCreated`) hoặc cập nhật cache.
+
+* * * * *
+
+### **5\. Layered Architecture**
+
+-   Chia hệ thống thành 4 lớp:
+    -   **Presentation**: Controllers, Requests xử lý giao diện người dùng.
+    -   **Application**: Use cases (commands, queries, handlers).
+    -   **Domain**: Logic nghiệp vụ cốt lõi.
+    -   **Infrastructure**: Tích hợp công cụ bên ngoài (ORM, Message Bus).
+
+* * * * *
+
+### **6\. Componentization**
+
+-   **Package by Component**: Phân tách code theo domain hoặc feature (e.g., `course-management-module`).
+-   **Shared Kernel**: Chia sẻ các thành phần tái sử dụng như `BaseEvent`, `BaseRepositoryInterface`.
+
+* * * * *
+
+### **Kết Luận**
+
+Đây là một kiến trúc hiện đại, phù hợp cho các dự án phức tạp và yêu cầu phát triển lâu dài.
+
+Cấu trúc module này kết hợp các nguyên tắc **Ports & Adapters**, **DDD**, **CQRS**, và **EDA** để đạt được các lợi ích gì?
 
 ```
